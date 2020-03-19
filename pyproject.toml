@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "AlekSIS-App-LDAP"
+version = "1.0"
+packages = [
+    { include = "aleksis" }
+]
+readme = "README.rst"
+
+description = "AlekSIS (School Information System) — App LDAP (General LDAP import/export)"
+authors = ["Tom Teichler <tom.teichler@teckids.org>"]
+license = "EUPL-1.2"
+homepage = "https://aleksis.edugit.io/"
+repository = "https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP/AlekSIS-App-LDAP"
+documentation = "https://aleksis.edugit.io/AlekSIS/docs/html/"
+classifiers = [
+    "Environment :: Web Environment",
+    "Intended Audience :: Education",
+    "Topic :: Education"
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+AlekSIS = { path = "../../.." }
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"

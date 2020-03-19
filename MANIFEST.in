@@ -1,0 +1,4 @@
+include LICENCE.rst
+recursive-include aleksis/apps/*/static *
+recursive-include aleksis/apps/*/templates *
+recursive-include aleksis/apps/*/migrations *
