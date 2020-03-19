@@ -8,7 +8,7 @@ def ldap_create_user(sender, **kwargs):
     if config.ENABLE_LDAP_SYNC:
         if not sender.person:
             if config.LDAP_SYNC_STRATEGY == 'match-create':
-                if not Person.objects.get(full_name=sender.get_full_name()) or not Person.objects.get(email=sender.email)
+                if not Person.objects.get(full_name=sender.get_full_name()) or not Person.objects.get(email=sender.email):
                     person = Person.objects.create(
                         first_name = sender.first_name,
                         last_name = sender.last_name,
