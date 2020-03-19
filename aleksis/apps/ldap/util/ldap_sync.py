@@ -4,9 +4,7 @@ from constance import config
 
 from aleksis.core.models import Person
 
-User = get_user_model()
-
-def create_person(sender, **kwargs):
+def ldap_create_user(sender, **kwargs):
     if config.ENABLE_LDAP_SYNC:
         if not sender.person:
             if config.LDAP_SYNC_STRATEGY == 'match-create':
