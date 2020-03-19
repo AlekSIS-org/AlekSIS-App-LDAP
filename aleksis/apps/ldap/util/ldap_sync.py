@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from constance import config
 
 def ldap_create_user(sender, **kwargs):
-    Person = apps.get_model("aleksis.core", "Person")
+    Person = apps.get_model("core", "Person")
     if config.ENABLE_LDAP_SYNC:
         if not sender.person:
             if config.LDAP_SYNC_STRATEGY == 'match-create':
