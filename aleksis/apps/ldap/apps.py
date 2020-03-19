@@ -9,7 +9,7 @@ class LDAPConfig(AppConfig):
     name = "aleksis.apps.ldap"
     verbose_name = "AlekSIS — LDAP (General LDAP import/export)"
 
-    def ready() -> None:
+    def ready(self) -> None:
         super().ready()
         User = get_user_model()
         post_save.connect(ldap_create_user, sender=User)
