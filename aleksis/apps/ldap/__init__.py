@@ -5,4 +5,4 @@ try:
 except Exception:
     __version__ = "unknown"
 
-default_app_config = "aleksis.apps.ldap.apps.DefaultConfig"
+default_app_config = "aleksis.apps.ldap.apps.LDAPConfig"
