@@ -1,10 +1,10 @@
+import django.apps
 from django.contrib.auth import get_user_model
 
 from constance import config
 
-from aleksis.core.models import Person
-
 def ldap_create_user(sender, **kwargs):
+    Person = apps.get_model("aleksis.core", "Person")
     if config.ENABLE_LDAP_SYNC:
         if not sender.person:
             if config.LDAP_SYNC_STRATEGY == 'match-create':
