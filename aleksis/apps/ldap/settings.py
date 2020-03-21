@@ -1,13 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
 CONSTANCE_ADDITIONAL_FIELDS = {
-    "strategy-select": ['django.forms.fields.ChoiceField', {
-        'widget': 'django.forms.Select',
-        'choices': ((None, "-----"),
-                    ("match-only", _("Only match persons to users")),
-                    ("match-create", _("Match and create persons")),
-                    )
-    }],
     "matching-fields-select": ['django.forms.fields.ChoiceField', {
         'widget': 'django.forms.Select',
         'choices': ((None, "-----"),
