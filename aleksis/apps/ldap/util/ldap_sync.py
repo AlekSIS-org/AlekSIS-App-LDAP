@@ -11,30 +11,28 @@ def ldap_create_user(sender, instance, created, raw, using, update_fields, **kwa
     if config.ENABLE_LDAP_SYNC and (created or config.LDAP_SYNC_ON_UPDATE):
         # Check if there is an existing person connected to the user.
         if not Person.objects.filter(user=instance).exists():
-            if config.LDAP_MATCHING_FIELDS == 'match-email':
+            if config.LDAP_MATCHING_FIELDS == "match-email":
                 # Get or create a person matching to email field.
                 person, created = Person.objects.get_or_create(
                     email=instance.email,
                     defaults={
                         "first_name": instance.first_name,
                         "last_name": instance.last_name,
-                    }
+                    },
                 )
-            elif config.LDAP_MATCHING_FIELDS == 'match-name':
+            elif config.LDAP_MATCHING_FIELDS == "match-name":
                 # Get or create a person matching to the first and last name.
                 person, created = Person.objects.get_or_create(
                     first_name=instance.first_name,
                     last_name=instance.last_name,
-                    defaults={
-                        "email": instance.email
-                    }
+                    defaults={"email": instance.email},
                 )
-            elif config.LDAP_MATCHING_FIELDS == 'match-email-name':
+            elif config.LDAP_MATCHING_FIELDS == "match-email-name":
                 # Get or create a person matching to the email and the first and last name.
                 person, created = Person.objects.get_or_create(
                     first_name=instance.first_name,
                     last_name=instance.last_name,
-                    email=instance.email
+                    email=instance.email,
                 )
 
             # Save person if enabled in config or no new person was created.
