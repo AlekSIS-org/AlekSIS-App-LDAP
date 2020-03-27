@@ -7,6 +7,7 @@ from constance import config
 def ldap_create_user(sender, instance, created, raw, using, update_fields, **kwargs):
     """ Find ldap users by configurable matching fields and connect them to django users. """
     Person = apps.get_model("core", "Person")
+    Group = apps.get_model("core", "Group")
 
     if config.ENABLE_LDAP_SYNC and (created or config.LDAP_SYNC_ON_UPDATE):
         # Check if there is an existing person connected to the user.
@@ -39,3 +40,22 @@ def ldap_create_user(sender, instance, created, raw, using, update_fields, **kwa
             if config.LDAP_SYNC_CREATE or not created:
                 person.user = instance
                 person.save()
+
+        if config.ENABLE_LDAP_GROUP_SYNC:
+            group_objects = []
+            groups = instance.ldap_user._get_groups()
+            group_infos = list(groups._get_group_infos())
+            for ldap_group in group_infos:
+                group, created = Group.objects.get_or_create(
+                    import_ref = ldap_group[0],
+                    defaults = {
+                        "short_name": ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME][0][-16:],
+                        "name": ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0][:60]
+                    }
+                )
+
+                if config.LDAP_SYNC_CREATE_GROUPS or not created:
+                    group.save()
+                    group_objects.append(group)
+
+            instance.person.member_of.set(group_objects)
