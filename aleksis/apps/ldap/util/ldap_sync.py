@@ -14,7 +14,7 @@ def setting_name_from_field(model, field):
 def syncable_fields(model):
     """ Collect all fields that can be synced on a model """
 
-    return [field for field in models._meta.fields if field.editable and not field.auto_created]
+    return [field for field in model._meta.fields if field.editable and not field.auto_created]
 
 
 def update_constance_config_fields():
@@ -61,17 +61,16 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
                 return
 
             person.user = instance
-
-            # Synchronise additional fields if enabled
-            for field in syncable_fields(Person):
-                setting_name = setting_name_from_field(Person, field)
-
-                # Try sync if constance setting for this field is non-empty
-                ldap_field = getattr(config, setting_name, "")
-                if ldap_field and ldap_field in instance.ldap_user.attrs.data:
-                    setattr(person, field._meta.name, instance.ldap_user.attrs.data[ldap_field])
-
             person.save()
+
+        # Synchronise additional fields if enabled
+        for field in syncable_fields(Person):
+            setting_name = setting_name_from_field(Person, field)
+
+            # Try sync if constance setting for this field is non-empty
+            ldap_field = getattr(config, setting_name, "")
+            if ldap_field and ldap_field in instance.ldap_user.attrs.data:
+                setattr(instance.person, field.name, instance.ldap_user.attrs.data[ldap_field][0])
 
         if config.ENABLE_LDAP_GROUP_SYNC:
             # Resolve Group objects from LDAP group objects
