@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from constance import config
 
 
-def ldap_create_user(sender, instance, created, raw, using, update_fields, **kwargs):
+def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **kwargs):
     """ Find ldap users by configurable matching fields and connect them to django users. """
     Person = apps.get_model("core", "Person")
     Group = apps.get_model("core", "Group")
