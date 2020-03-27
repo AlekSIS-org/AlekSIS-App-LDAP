@@ -9,7 +9,7 @@ def ldap_create_user(sender, instance, created, raw, using, update_fields, **kwa
     Person = apps.get_model("core", "Person")
     Group = apps.get_model("core", "Group")
 
-    if config.ENABLE_LDAP_SYNC and (created or config.LDAP_SYNC_ON_UPDATE):
+    if config.ENABLE_LDAP_SYNC and (created or config.LDAP_SYNC_ON_UPDATE) and hasattr(instance, "ldap_user"):
         # Check if there is an existing person connected to the user.
         if not Person.objects.filter(user=instance).exists():
             if config.LDAP_MATCHING_FIELDS == "match-email":
