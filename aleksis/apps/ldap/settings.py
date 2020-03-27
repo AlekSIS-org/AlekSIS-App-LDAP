@@ -17,7 +17,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
 
 CONSTANCE_CONFIG = {
     "ENABLE_LDAP_SYNC": (True, _("Enable ldap sync"), bool),
-    "LDAP_SYNC_CREATE": (True, _("Create non-existing persons"), bool),
     "LDAP_SYNC_ON_UPDATE": (True, _("Also sync if user updates"), bool),
     "LDAP_MATCHING_FIELDS": (
         None,
@@ -32,7 +31,6 @@ CONSTANCE_CONFIG = {
 CONSTANCE_CONFIG_FIELDSETS = {
     "LDAP-Sync settings": (
         "ENABLE_LDAP_SYNC",
-        "LDAP_SYNC_CREATE",
         "LDAP_SYNC_ON_UPDATE",
         "LDAP_MATCHING_FIELDS",
         "ENABLE_LDAP_GROUP_SYNC",
