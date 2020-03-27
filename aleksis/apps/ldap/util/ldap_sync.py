@@ -11,6 +11,12 @@ def setting_name_from_field(model, field):
     return "LDAP_ADDITIONAL_FIELD_%s_%s" % (model._meta.label, field.name)
 
 
+def syncable_fields(model):
+    """ Collect all fields that can be synced on a model """
+
+    return [field for field in models._meta.fields if field.editable and not field.auto_created]
+
+
 def update_constance_config_fields():
     """ Auto-generate sync field settings from models """
 
@@ -18,13 +24,12 @@ def update_constance_config_fields():
     for model in (Person,):
         # Collect fields that are matchable
         setting_names = []
-        for field in model._meta.fields:
-            if field.editable and not field.auto_created:
-                setting_name = setting_name_from_field(model, field)
-                setting_desc = field.verbose_name
+        for field in syncable_fields(model):
+            setting_name = setting_name_from_field(model, field)
+            setting_desc = field.verbose_name
 
-                settings.CONSTANCE_CONFIG[setting_name] = ("", setting_desc, str)
-                setting_names.append(setting_name)
+            settings.CONSTANCE_CONFIG[setting_name] = ("", setting_desc, str)
+            setting_names.append(setting_name)
 
         # Add separate constance section if settings were generated
         if setting_names:
@@ -58,14 +63,13 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             person.user = instance
 
             # Synchronise additional fields if enabled
-            for field in Person._meta.fields:
-                if field.editable and not field.auto_created:
-                    setting_name = setting_name_from_field(Person, field)
+            for field in syncable_fields(Person):
+                setting_name = setting_name_from_field(Person, field)
 
-                    # Try sync if constance setting for this field is non-empty
-                    ldap_field = getattr(config, setting_name, "")
-                    if ldap_field and ldap_field in instance.ldap_user.attrs.data:
-                        setattr(person, field._meta.name, instance.ldap_user.attrs.data[ldap_field])
+                # Try sync if constance setting for this field is non-empty
+                ldap_field = getattr(config, setting_name, "")
+                if ldap_field and ldap_field in instance.ldap_user.attrs.data:
+                    setattr(person, field._meta.name, instance.ldap_user.attrs.data[ldap_field])
 
             person.save()
 
