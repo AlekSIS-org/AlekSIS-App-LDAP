@@ -24,7 +24,6 @@ CONSTANCE_CONFIG = {
         _("LDAP sync matching fields"),
         "matching-fields-select",
     ),
-    "LDAP_SYNC_ADDITIONAL_FIELDS": (True, _("Sync additional fields such as postal address or date of birth."), bool)
     "LDAP_SYNC_FIELD_STREET": (None, _("Field for street"), str),
     "LDAP_SYNC_FIELD_HOUSENUMBER": (None, _("Field for house number"), str),
     "LDAP_SYNC_FIELD_POSTAL_CODE": (None, _("Field for postal code"), str),
