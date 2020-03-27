@@ -24,6 +24,8 @@ CONSTANCE_CONFIG = {
         _("LDAP sync matching fields"),
         "matching-fields-select",
     ),
+    "LDAP_GROUP_SYNC_FIELD_SHORT_NAME": ("cn", _("Field for short name of group"), str),
+    "LDAP_GROUP_SYNC_FIELD_NAME": ("cn", _("Field for name of group"), str),
 }
 CONSTANCE_CONFIG_FIELDSETS = {
     "LDAP-Sync settings": (
@@ -31,5 +33,7 @@ CONSTANCE_CONFIG_FIELDSETS = {
         "LDAP_SYNC_CREATE",
         "LDAP_SYNC_ON_UPDATE",
         "LDAP_MATCHING_FIELDS",
+        "LDAP_GROUP_SYNC_FIELD_SHORT_NAME",
+        "LDAP_GROUP_SYNC_FIELD_NAME",
     ),
 }
