@@ -40,6 +40,11 @@ def update_constance_config_fields():
 def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **kwargs):
     """ Synchronise Person meta-data and groups from ldap_user on User update. """
 
+    # Semaphore to guard recursive saves within this signal
+    if getattr(instance, "_skip_signal", False):
+        return
+    instance._skip_signal = True
+
     Person = apps.get_model("core", "Person")
     Group = apps.get_model("core", "Group")
 
@@ -72,6 +77,8 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             if ldap_field and ldap_field in instance.ldap_user.attrs.data:
                 setattr(instance.person, field.name, instance.ldap_user.attrs.data[ldap_field][0])
 
+        instance.person.save()
+
         if config.ENABLE_LDAP_GROUP_SYNC:
             # Resolve Group objects from LDAP group objects
             group_objects = []
@@ -93,3 +100,6 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
 
             # Sync additional fields if enabled in config.
             ldap_user = instance.ldap_user
+
+    # Remove semaphore
+    del instance._skip_signal
