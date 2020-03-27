@@ -35,6 +35,17 @@ def ldap_create_user(sender, instance, created, raw, using, update_fields, **kwa
                     email=instance.email,
                 )
 
+            # Sync additional fields if enabled in config.
+            if config.LDAP_SYNC_ADDITIONAL_FIELDS:
+                ldap_user = instance.ldap_user
+                person.street = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_STREET]
+                person.housenumber = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_HOUSENUMBER]
+                person.postal_code = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_POSTAL_CODE]
+                person.place = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_PLACE]
+                person.phone_number = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_PHONE_NUMBER]
+                person.mobile_number = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_MOBILE_NUMBER]
+                person.date_of_birth = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_DATE_OF_BIRTH]
+
             # Save person if enabled in config or no new person was created.
             if config.LDAP_SYNC_CREATE or not created:
                 person.user = instance

@@ -24,6 +24,14 @@ CONSTANCE_CONFIG = {
         _("LDAP sync matching fields"),
         "matching-fields-select",
     ),
+    "LDAP_SYNC_ADDITIONAL_FIELDS": (True, _("Sync additional fields such as postal address or date of birth."), bool)
+    "LDAP_SYNC_FIELD_STREET": (None, _("Field for street"), str),
+    "LDAP_SYNC_FIELD_HOUSENUMBER": (None, _("Field for house number"), str),
+    "LDAP_SYNC_FIELD_POSTAL_CODE": (None, _("Field for postal code"), str),
+    "LDAP_SYNC_FIELD_PLACE": (None, _("Field for place"), str),
+    "LDAP_SYNC_FIELD_PHONE_NUMBER": (None, _("Field for phone number"), str),
+    "LDAP_SYNC_FIELD_MOBILE_NUMBER": (None, _("Field for mobile number"), str),
+    "LDAP_SYNC_FIELD_DATE_OF_BIRTH": (None, _("Field for date of birth"), str),
 }
 CONSTANCE_CONFIG_FIELDSETS = {
     "LDAP-Sync settings": (
@@ -31,5 +39,12 @@ CONSTANCE_CONFIG_FIELDSETS = {
         "LDAP_SYNC_CREATE",
         "LDAP_SYNC_ON_UPDATE",
         "LDAP_MATCHING_FIELDS",
+        "LDAP_SYNC_FIELD_STREET",
+        "LDAP_SYNC_FIELD_HOUSENUMBER",
+        "LDAP_SYNC_FIELD_POSTAL_CODE",
+        "LDAP_SYNC_FIELD_PLACE",
+        "LDAP_SYNC_FIELD_PHONE_NUMBER",
+        "LDAP_SYNC_FIELD_MOBILE_NUMBER",
+        "LDAP_SYNC_FIELD_DATE_OF_BIRTH",
     ),
 }
