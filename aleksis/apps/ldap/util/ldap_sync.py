@@ -5,7 +5,8 @@ from constance import config
 
 
 def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **kwargs):
-    """ Find ldap users by configurable matching fields and connect them to django users. """
+    """ Synchronise Person meta-data and groups from ldap_user on User update. """
+
     Person = apps.get_model("core", "Person")
     Group = apps.get_model("core", "Group")
 
@@ -30,6 +31,7 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             person.save()
 
         if config.ENABLE_LDAP_GROUP_SYNC:
+            # Resolve Group objects from LDAP group objects
             group_objects = []
             groups = instance.ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
@@ -44,4 +46,5 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
 
                 group_objects.append(group)
 
+            # Replace linked groups of logged-in user completely
             instance.person.member_of.set(group_objects)
