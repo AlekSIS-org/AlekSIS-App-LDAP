@@ -1,7 +1,35 @@
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from constance import config
+
+
+def setting_name_from_field(model, field):
+    """ Generate a constance setting name from a model field """
+
+    return "LDAP_ADDITIONAL_FIELD_%s_%s" % (model._meta.label, field.name)
+
+
+def update_constance_config_fields():
+    """ Auto-generate sync field settings from models """
+
+    Person = apps.get_model("core", "Person")
+    for model in (Person,):
+        # Collect fields that are matchable
+        setting_names = []
+        for field in model._meta.fields:
+            if field.editable and not field.auto_created:
+                setting_name = setting_name_from_field(model, field)
+                setting_desc = field.verbose_name
+
+                settings.CONSTANCE_CONFIG[setting_name] = ("", setting_desc, str)
+                setting_names.append(setting_name)
+
+        # Add separate constance section if settings were generated
+        if setting_names:
+            fieldset_name = "LDAP-Sync: Additional fields for %s" % model._meta.verbose_name
+            settings.CONSTANCE_CONFIG_FIELDSETS[fieldset_name] = setting_names
 
 
 def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **kwargs):
@@ -28,6 +56,17 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
                 return
 
             person.user = instance
+
+            # Synchronise additional fields if enabled
+            for field in Person._meta.fields:
+                if field.editable and not field.auto_created:
+                    setting_name = setting_name_from_field(Person, field)
+
+                    # Try sync if constance setting for this field is non-empty
+                    ldap_field = getattr(config, setting_name, "")
+                    if ldap_field and ldap_field in instance.ldap_user.attrs.data:
+                        setattr(person, field._meta.name, instance.ldap_user.attrs.data[ldap_field])
+
             person.save()
 
         if config.ENABLE_LDAP_GROUP_SYNC:
@@ -51,10 +90,3 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
 
             # Sync additional fields if enabled in config.
             ldap_user = instance.ldap_user
-            person.street = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_STREET]
-            person.housenumber = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_HOUSENUMBER]
-            person.postal_code = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_POSTAL_CODE]
-            person.place = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_PLACE]
-            person.phone_number = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_PHONE_NUMBER]
-            person.mobile_number = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_MOBILE_NUMBER]
-            person.date_of_birth = ldap_user.attrs.data[config.LDAP_SYNC_FIELD_DATE_OF_BIRTH]
