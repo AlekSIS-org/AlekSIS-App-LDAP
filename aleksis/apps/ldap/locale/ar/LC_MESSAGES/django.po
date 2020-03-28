@@ -1,0 +1,90 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-28 17:50+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: settings.py:11
+msgid "Match only on email"
+msgstr ""
+
+#: settings.py:12
+msgid "Match only on name"
+msgstr ""
+
+#: settings.py:13
+msgid "Match on email and name"
+msgstr ""
+
+#: settings.py:20
+msgid "Enable ldap sync"
+msgstr ""
+
+#: settings.py:21
+msgid "Also sync if user updates"
+msgstr ""
+
+#: settings.py:24
+msgid "LDAP sync matching fields"
+msgstr ""
+
+#: settings.py:27
+msgid "Enable ldap group sync"
+msgstr ""
+
+#: settings.py:28
+msgid "Field for short name of group"
+msgstr ""
+
+#: settings.py:29
+msgid ""
+"Regular expression to match LDAP value for group short name against, e.g. "
+"class_(?P<class>.*); separate multiple patterns by |"
+msgstr ""
+
+#: settings.py:30
+msgid ""
+"Replacement template to apply to group short name, e.g. \\g<class>; separate "
+"multiple templates by |"
+msgstr ""
+
+#: settings.py:31
+msgid "Field for name of group"
+msgstr ""
+
+#: settings.py:32
+msgid ""
+"Regular expression to match LDAP value for group name against, e.g. class_(?"
+"P<class>.*); separate multiple patterns by |"
+msgstr ""
+
+#: settings.py:33
+msgid ""
+"Replacement template to apply to group name, e.g. \\g<class>; separate "
+"multiple templates by |"
+msgstr ""
+
+#: util/ldap_sync.py:54
+#, python-format
+msgid "Regular expression to match LDAP value for %s against"
+msgstr ""
+
+#: util/ldap_sync.py:55
+#, python-format
+msgid "Replacement template to apply to %s"
+msgstr ""
