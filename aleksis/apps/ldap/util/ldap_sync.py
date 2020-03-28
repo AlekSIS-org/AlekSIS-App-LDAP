@@ -117,9 +117,6 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             # Replace linked groups of logged-in user completely
             person.member_of.set(group_objects)
 
-            # Sync additional fields if enabled in config.
-            ldap_user = instance.ldap_user
-
         try:
             person.save()
         except Exception:
