@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import fields
 
 from constance import config
 
@@ -15,6 +16,24 @@ def syncable_fields(model):
     """ Collect all fields that can be synced on a model """
 
     return [field for field in model._meta.fields if field.editable and not field.auto_created]
+
+
+def from_ldap(value, field):
+    """ Convert an LDAP value to the Python type of the target field
+
+    This conversion is prone to error because LDAP deliberately breaks
+    standards to cope with ASN.1 limitations.
+    """
+
+    from ldapdb.models.fields import datetime_from_ldap  # noqa
+
+    # Pre-convert DateTimeField and DateField due to ISO 8601 limitations in RFC 4517
+    if type(field) in (fields.DateField, fields.DateTimeField):
+        # Be opportunistic, but keep old value if conversion fails
+        value = datetime_from_ldap(value) or value
+
+    # Finally, use field's conversion method as default
+    return field.to_python(value)
 
 
 def update_constance_config_fields():
@@ -73,9 +92,10 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             setting_name = setting_name_from_field(Person, field)
 
             # Try sync if constance setting for this field is non-empty
-            ldap_field = getattr(config, setting_name, "")
+            ldap_field = getattr(config, setting_name, "").lower()
             if ldap_field and ldap_field in instance.ldap_user.attrs.data:
-                setattr(instance.person, field.name, instance.ldap_user.attrs.data[ldap_field][0])
+                setattr(instance.person, field.name,
+                        from_ldap(instance.ldap_user.attrs.data[ldap_field][0], field))
 
         instance.person.save()
 
