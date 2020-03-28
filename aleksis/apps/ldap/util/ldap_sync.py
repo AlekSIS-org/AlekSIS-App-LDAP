@@ -1,3 +1,5 @@
+import re
+
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -56,6 +58,23 @@ def update_constance_config_fields():
             settings.CONSTANCE_CONFIG_FIELDSETS[fieldset_name] = setting_names
 
 
+def apply_templates(value, patterns, templates, separator="|"):
+    """ Regex-replace patterns in value in order """
+
+    # Split lists if they are strings
+    if isinstance(patterns, str):
+        patterns = patterns.split(separator)
+    if isinstance(templates, str):
+        templates = templates.split(separator)
+
+    for pattern, template in zip(patterns, templates):
+        match = re.fullmatch(pattern, value)
+        if match:
+            value = match.expand(template)
+
+    return value
+
+
 def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **kwargs):
     """ Synchronise Person meta-data and groups from ldap_user on User update. """
 
@@ -104,11 +123,27 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             groups = instance.ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
             for ldap_group in group_infos:
+                # Apply regex replace from config
+                short_name = apply_templates(
+                    ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME][0],
+                    config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME_RE,
+                    config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME_REPLACE
+                )
+                name = apply_templates(
+                    ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0],
+                    config.LDAP_GROUP_SYNC_FIELD_NAME_RE,
+                    config.LDAP_GROUP_SYNC_FIELD_NAME_REPLACE
+                )
+
+                # Shorten names to fit into model fields
+                short_name = short_name[:Group._meta.get_field("short_name").max_length]
+                name = name[:Group._meta.get_field("name").max_length]
+
                 group, created = Group.objects.update_or_create(
                     import_ref = ldap_group[0],
                     defaults = {
-                        "short_name": ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME][0][-16:],
-                        "name": ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0][:60]
+                        "short_name": short_name,
+                        "name": name
                     }
                 )
 
