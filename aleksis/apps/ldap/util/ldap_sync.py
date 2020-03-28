@@ -18,7 +18,8 @@ def setting_name_from_field(model, field):
 def syncable_fields(model):
     """ Collect all fields that can be synced on a model """
 
-    return [field for field in model._meta.fields if field.editable and not field.auto_created]
+    return [field for field in model._meta.fields if (
+        field.editable and not field.auto_created and not field.is_relation)]
 
 
 def from_ldap(value, field):
