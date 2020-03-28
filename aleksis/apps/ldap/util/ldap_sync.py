@@ -1,7 +1,10 @@
+import re
+
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import fields
+from django.utils.translation import gettext as _
 
 from constance import config
 
@@ -48,12 +51,34 @@ def update_constance_config_fields():
             setting_desc = field.verbose_name
 
             settings.CONSTANCE_CONFIG[setting_name] = ("", setting_desc, str)
-            setting_names.append(setting_name)
+            settings.CONSTANCE_CONFIG[setting_name + "_RE"] = ("", _("Regular expression to match LDAP value for %s against") % setting_desc, str)
+            settings.CONSTANCE_CONFIG[setting_name + "_REPLACE"] = ("", _("Replacement template to apply to %s") % setting_desc, str)
+
+            setting_names += [setting_name, setting_name + "_RE", setting_name + "_REPLACE"]
 
         # Add separate constance section if settings were generated
         if setting_names:
             fieldset_name = "LDAP-Sync: Additional fields for %s" % model._meta.verbose_name
             settings.CONSTANCE_CONFIG_FIELDSETS[fieldset_name] = setting_names
+
+
+def apply_templates(value, patterns, templates, separator="|"):
+    """ Regex-replace patterns in value in order """
+
+    if isinstance(patterns, str):
+        patterns = patterns.split(separator)
+    if isinstance(templates, str):
+        templates = templates.split(separator)
+
+    for pattern, template in zip(patterns, templates):
+        if not pattern or not template:
+            continue
+
+        match = re.fullmatch(pattern, value)
+        if match:
+            value = match.expand(template)
+
+    return value
 
 
 def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **kwargs):
@@ -95,8 +120,17 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             # Try sync if constance setting for this field is non-empty
             ldap_field = getattr(config, setting_name, "").lower()
             if ldap_field and ldap_field in instance.ldap_user.attrs.data:
-                setattr(person, field.name,
-                        from_ldap(instance.ldap_user.attrs.data[ldap_field][0], field))
+                value = instance.ldap_user.attrs.data[ldap_field][0]
+
+                # Apply regex replace from config
+                patterns = getattr(config, setting_name + "_RE", "")
+                templates = getattr(config, setting_name + "_REPLACE", "")
+                value = apply_templates(value, patterns, templates)
+
+                # Opportunistically convert LDAP string value to Python object
+                value = from_ldap(value, field)
+
+                setattr(person, field.name, value)
 
         if config.ENABLE_LDAP_GROUP_SYNC:
             # Resolve Group objects from LDAP group objects
@@ -104,11 +138,27 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             groups = instance.ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
             for ldap_group in group_infos:
+                # Apply regex replace from config
+                short_name = apply_templates(
+                    ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME][0],
+                    config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME_RE,
+                    config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME_REPLACE
+                )
+                name = apply_templates(
+                    ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0],
+                    config.LDAP_GROUP_SYNC_FIELD_NAME_RE,
+                    config.LDAP_GROUP_SYNC_FIELD_NAME_REPLACE
+                )
+
+                # Shorten names to fit into model fields
+                short_name = short_name[:Group._meta.get_field("short_name").max_length]
+                name = name[:Group._meta.get_field("name").max_length]
+
                 group, created = Group.objects.update_or_create(
                     import_ref = ldap_group[0],
                     defaults = {
-                        "short_name": ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME][0][-16:],
-                        "name": ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0][:60]
+                        "short_name": short_name,
+                        "name": name
                     }
                 )
 
