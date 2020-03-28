@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 
 CONSTANCE_ADDITIONAL_FIELDS = {
@@ -24,7 +25,6 @@ CONSTANCE_CONFIG = {
         "matching-fields-select",
     ),
     "ENABLE_LDAP_GROUP_SYNC": (True, _("Enable ldap group sync"), bool),
-    "LDAP_SYNC_CREATE_GROUPS": (True, _("Create non-existing groups"), bool),
     "LDAP_GROUP_SYNC_FIELD_SHORT_NAME": ("cn", _("Field for short name of group"), str),
     "LDAP_GROUP_SYNC_FIELD_NAME": ("cn", _("Field for name of group"), str),
 }
@@ -34,7 +34,6 @@ CONSTANCE_CONFIG_FIELDSETS = {
         "LDAP_SYNC_ON_UPDATE",
         "LDAP_MATCHING_FIELDS",
         "ENABLE_LDAP_GROUP_SYNC",
-        "LDAP_SYNC_CREATE_GROUPS",
         "LDAP_GROUP_SYNC_FIELD_SHORT_NAME",
         "LDAP_GROUP_SYNC_FIELD_NAME",
     ),
