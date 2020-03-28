@@ -69,7 +69,9 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
 
     if config.ENABLE_LDAP_SYNC and (created or config.LDAP_SYNC_ON_UPDATE) and hasattr(instance, "ldap_user"):
         # Check if there is an existing person connected to the user.
-        if not Person.objects.filter(user=instance).exists():
+        if Person.objects.filter(user=instance).exists():
+            person = instance.person
+        else:
             # Build filter criteria depending on config
             matches = {}
             if "-email" in config.LDAP_MATCHING_FIELDS:
@@ -85,7 +87,6 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
                 return
 
             person.user = instance
-            person.save()
 
         # Synchronise additional fields if enabled
         for field in syncable_fields(Person):
@@ -94,10 +95,8 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
             # Try sync if constance setting for this field is non-empty
             ldap_field = getattr(config, setting_name, "").lower()
             if ldap_field and ldap_field in instance.ldap_user.attrs.data:
-                setattr(instance.person, field.name,
+                setattr(person, field.name,
                         from_ldap(instance.ldap_user.attrs.data[ldap_field][0], field))
-
-        instance.person.save()
 
         if config.ENABLE_LDAP_GROUP_SYNC:
             # Resolve Group objects from LDAP group objects
@@ -116,10 +115,17 @@ def ldap_sync_from_user(sender, instance, created, raw, using, update_fields, **
                 group_objects.append(group)
 
             # Replace linked groups of logged-in user completely
-            instance.person.member_of.set(group_objects)
+            person.member_of.set(group_objects)
 
             # Sync additional fields if enabled in config.
             ldap_user = instance.ldap_user
+
+        try:
+            person.save()
+        except Exception:
+            # Exceptions here are silenced because the synchronisation is optional
+            # FIXME throw warning to user instead
+            pass
 
     # Remove semaphore
     del instance._skip_signal
