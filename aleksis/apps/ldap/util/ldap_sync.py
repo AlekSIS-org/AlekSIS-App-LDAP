@@ -244,10 +244,6 @@ def mass_ldap_import():
         logger.info("Will %s user %s in Django" % ("create" if created else "update", uid))
 
         # Run creation and/or population, like the auth backend would
-        ldap_user._get_or_create_user()
-        user = ldap_user._user
-
-        # Trigger sync run like on login signal
-        ldap_sync_from_user(user.__class__, user, created)
+        ldap_user._get_or_create_user(force_populate=config.LDAP_SYNC_ON_UPDATE)
 
         logger.info("Successfully imported user %s" % uid)
