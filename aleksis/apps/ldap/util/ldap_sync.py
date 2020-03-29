@@ -4,6 +4,7 @@ import re
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
 from django.db.models import fields
 from django.utils.translation import gettext as _
 
@@ -86,6 +87,7 @@ def apply_templates(value, patterns, templates, separator="|"):
     return value
 
 
+@transaction.atomic
 def ldap_sync_from_user(sender, instance, created, **kwargs):
     """ Synchronise Person meta-data and groups from ldap_user on User update. """
 
@@ -112,14 +114,19 @@ def ldap_sync_from_user(sender, instance, created, **kwargs):
                 matches["last_name"] = instance.last_name
 
             try:
-                person = Person.objects.get(**matches)
+                with transaction.atomic():
+                    person = Person.objects.get(**matches)
             except Person.DoesNotExist:
                 # Bail out of further processing
-                logger.info("No matching person for user %s" % instance.username)
+                logger.warn("No matching person for user %s" % instance.username)
                 return
-
-            person.user = instance
-            logger.info("Matching person %s linked to user %s" % (str(person), instance.username))
+            except Person.MultipleObjectsReturned:
+                # Bail out of further processing
+                logger.error("More than one matching person for user %s" % instance.username)
+                return
+            else:
+                person.user = instance
+                logger.info("Matching person %s linked to user %s" % (str(person), instance.username))
 
         # Synchronise additional fields if enabled
         for field in syncable_fields(Person):
@@ -177,18 +184,24 @@ def ldap_sync_from_user(sender, instance, created, **kwargs):
                 short_name = short_name[:Group._meta.get_field("short_name").max_length]
                 name = name[:Group._meta.get_field("name").max_length]
 
-                group, created = Group.objects.update_or_create(
-                    import_ref = ldap_group[0],
-                    defaults = {
-                        "short_name": short_name,
-                        "name": name
-                    }
-                )
-                logger.info("%s LDAP group %s for Django group %s" % (
-                    ("Created" if created else "Updated"),
-                    ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0],
-                    name
-                ))
+                try:
+                    with transaction.atomic():
+                        group, created = Group.objects.update_or_create(
+                            import_ref = ldap_group[0],
+                            defaults = {
+                                "short_name": short_name,
+                                "name": name
+                            }
+                        )
+                except IntegrityError:
+                    logger.error("Integrity error while trying to import LDAP group %s" % ldap_group[0])
+                    continue
+                else:
+                    logger.info("%s LDAP group %s for Django group %s" % (
+                        ("Created" if created else "Updated"),
+                        ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0],
+                        name
+                    ))
 
                 group_objects.append(group)
 
@@ -207,6 +220,7 @@ def ldap_sync_from_user(sender, instance, created, **kwargs):
     del instance._skip_signal
 
 
+@transaction.atomic
 def mass_ldap_import():
     """ Utility code for mass import from ldap """
 
