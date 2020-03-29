@@ -4,7 +4,7 @@ import re
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError, transaction
+from django.db import DataError, IntegrityError, transaction
 from django.db.models import fields
 from django.utils.translation import gettext as _
 
@@ -135,7 +135,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 
 
 @transaction.atomic
-def ldap_sync_from_user(user, attrs):
+def ldap_sync_from_user(user, dn, attrs):
     """ Synchronise person information from a User object (with ldap_user) to Django """
 
     Person = apps.get_model("core", "Person")
@@ -143,7 +143,9 @@ def ldap_sync_from_user(user, attrs):
     # Check if there is an existing person connected to the user.
     if Person.objects.filter(user=user).exists():
         person = user.person
+        created = False
         logger.info("Existing person %s already linked to user %s" % (str(person), user.username))
+    # FIXME ALso account for existing person with DN here
     else:
         # Build filter criteria depending on config
         matches = {}
@@ -157,28 +159,20 @@ def ldap_sync_from_user(user, attrs):
             matches["last_name"] = user.last_name
             defaults["email"] = user.email
 
-        try:
-            with transaction.atomic():
-                if config.LDAP_SYNC_CREATE_MISSING_PERSONS:
-                    person, created = Person.objects.get_or_create(**matches, defaults=defaults)
-                else:
-                    person = Person.objects.get(**matches)
-                    created = False
-        except Person.DoesNotExist:
-            # Bail out of further processing
-            logger.warn("No matching person for user %s" % user.username)
-            return
-        except Person.MultipleObjectsReturned:
-            # Bail out of further processing
-            logger.error("More than one matching person for user %s" % user.username)
-            return
+        if config.LDAP_SYNC_CREATE_MISSING_PERSONS:
+            person, created = Person.objects.get_or_create(**matches, defaults=defaults)
         else:
-            person.user = user
-            if not created:
-                person.first_name = user.first_name
-                person.last_name = user.last_name
-                person.email = user.email
-            logger.info("Matching person %s linked to user %s" % (str(person), user.username))
+            person = Person.objects.get(**matches)
+            created = False
+
+        person.user = user
+        logger.info("%s person %s linked to user %s" % ("New" if created else "Existing", str(person), user.username))
+
+    person.ldap_dn = dn
+    if not created:
+        person.first_name = user.first_name
+        person.last_name = user.last_name
+        person.email = user.email
 
     # Synchronise additional fields if enabled
     for field in syncable_fields(Person):
@@ -200,6 +194,7 @@ def ldap_sync_from_user(user, attrs):
             setattr(person, field.name, value)
             logger.debug("Field %s set to %s for %s" % (field.name, str(value), str(person)))
 
+    person.save()
     return person
 
 
@@ -213,6 +208,7 @@ def ldap_sync_from_groups(group_infos):
     group_objects = []
     for ldap_group in tqdm(group_infos):
         # Skip group if one of the name fields is missing
+        # FIXME Throw exceptions and catch outside
         if config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME not in ldap_group[1]:
             logger.error("LDAP group with DN %s does not have field %s" % (
                 ldap_group[0],
@@ -242,17 +238,18 @@ def ldap_sync_from_groups(group_infos):
         short_name = short_name[:Group._meta.get_field("short_name").max_length]
         name = name[:Group._meta.get_field("name").max_length]
 
+        # FIXME FInd a way to throw exceptions correctly but still continue import
         try:
             with transaction.atomic():
                 group, created = Group.objects.update_or_create(
-                    import_ref = ldap_group[0],
+                    ldap_dn = ldap_group[0],
                     defaults = {
                         "short_name": short_name,
                         "name": name
                     }
                 )
-        except IntegrityError:
-            logger.error("Integrity error while trying to import LDAP group %s" % ldap_group[0])
+        except IntegrityError as e:
+            logger.error("Integrity error while trying to import LDAP group %s:\n%s" % (ldap_group[0], str(e)))
             continue
         else:
             logger.info("%s LDAP group %s for Django group %s" % (
@@ -271,6 +268,8 @@ def mass_ldap_import():
     """ Utility code for mass import from ldap """
 
     from django_auth_ldap.backend import LDAPBackend, _LDAPUser  # noqa
+
+    Person = apps.get_model("core", "Person")
 
     # Abuse pre-configured search object as general LDAP interface
     backend = LDAPBackend()
@@ -296,7 +295,34 @@ def mass_ldap_import():
         user, created = backend.get_or_build_user(uid, ldap_user)
 
         if created or config.LDAP_SYNC_ON_UPDATE:
-            logger.info("Will %s user %s in Django" % ("create" if created else "update", uid))
-            person = ldap_sync_from_user(user, attrs)
+            try:
+                with transaction.atomic():
+                    person = ldap_sync_from_user(user, dn, attrs)
+            except Person.DoesNotExist:
+                logger.warn("No matching person for user %s" % user.username)
+                continue
+            except Person.MultipleObjectsReturned:
+                logger.error("More than one matching person for user %s" % user.username)
+                continue
+            except (DataError, IntegrityError, ValueError) as e:
+                logger.error("Data error while synchronising user %s:\n%s" % (user.username, str(e)))
+                continue
+            else:
+                logger.info("Successfully imported user %s" % uid)
 
-        logger.info("Successfully imported user %s" % uid)
+    # Synchronise group memberships now
+    if config.ENABLE_LDAP_GROUP_SYNC:
+        member_attr = getattr(backend.settings.GROUP_TYPE, "member_attr", "memberUid")
+
+        for group, ldap_group in tqdm(zip(group_objects, ldap_groups)):
+            dn, attrs = ldap_group
+            ldap_members = attrs[member_attr]
+
+            if member_attr.lower() == "memberUid":
+                members = Person.objects.filter(user__username__in=ldap_members)
+            else:
+                members = Person.objects.filter(ldap_dn__in=ldap_members)
+
+            group.members.set(members)
+            group.save()
+            logger.info("Set group members of group %s" % str(group))
