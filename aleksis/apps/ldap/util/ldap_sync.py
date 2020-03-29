@@ -147,6 +147,20 @@ def ldap_sync_from_user(sender, instance, created, **kwargs):
             groups = instance.ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
             for ldap_group in group_infos:
+                # Skip group if one of the name fields is missing
+                if config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME not in ldap_group[1]:
+                    logger.error("LDAP group with DN %s does not have field %s" % (
+                        ldap_group[0],
+                        config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME
+                    ))
+                    continue
+                if config.LDAP_GROUP_SYNC_FIELD_NAME not in ldap_group[1]:
+                    logger.error("LDAP group with DN %s does not have field %s" % (
+                        ldap_group[0],
+                        config.LDAP_GROUP_SYNC_FIELD_NAME
+                    ))
+                    continue
+
                 # Apply regex replace from config
                 short_name = apply_templates(
                     ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME][0],
