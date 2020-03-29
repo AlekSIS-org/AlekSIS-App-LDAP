@@ -147,15 +147,23 @@ def ldap_sync_from_user(user, attrs):
     else:
         # Build filter criteria depending on config
         matches = {}
+        defaults = {}
         if "-email" in config.LDAP_MATCHING_FIELDS:
             matches["email"] = user.email
+            defaults["first_name"] = user.first_name
+            defaults["last_name"] = user.last_name
         if "-name" in config.LDAP_MATCHING_FIELDS:
             matches["first_name"] = user.first_name
             matches["last_name"] = user.last_name
+            defaults["email"] = user.email
 
         try:
             with transaction.atomic():
-                person = Person.objects.get(**matches)
+                if config.LDAP_SYNC_CREATE_MISSING_PERSONS:
+                    person, created = Person.objects.get_or_create(**matches, defaults=defaults)
+                else:
+                    person = Person.objects.get(**matches)
+                    created = False
         except Person.DoesNotExist:
             # Bail out of further processing
             logger.warn("No matching person for user %s" % user.username)
@@ -166,6 +174,10 @@ def ldap_sync_from_user(user, attrs):
             return
         else:
             person.user = user
+            if not created:
+                person.first_name = user.first_name
+                person.last_name = user.last_name
+                person.email = user.email
             logger.info("Matching person %s linked to user %s" % (str(person), user.username))
 
     # Synchronise additional fields if enabled
