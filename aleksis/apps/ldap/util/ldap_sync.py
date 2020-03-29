@@ -135,7 +135,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 
 
 @transaction.atomic
-def ldap_sync_from_user(user):
+def ldap_sync_from_user(user, attrs):
     """ Synchronise person information from a User object (with ldap_user) to Django """
 
     Person = apps.get_model("core", "Person")
@@ -174,8 +174,8 @@ def ldap_sync_from_user(user):
 
         # Try sync if constance setting for this field is non-empty
         ldap_field = getattr(config, setting_name, "").lower()
-        if ldap_field and ldap_field in user.ldap_user.attrs.data:
-            value = user.ldap_user.attrs.data[ldap_field][0]
+        if ldap_field and ldap_field in attrs:
+            value = attrs[ldap_field][0]
 
             # Apply regex replace from config
             patterns = getattr(config, setting_name + "_RE", "")
@@ -282,10 +282,9 @@ def mass_ldap_import():
 
         # Find out whether the User object would be created, but do not save
         user, created = backend.get_or_build_user(uid, ldap_user)
-        user.ldap_user = ldap_user
 
         if created or config.LDAP_SYNC_ON_UPDATE:
             logger.info("Will %s user %s in Django" % ("create" if created else "update", uid))
-            person = ldap_sync_from_user(user)
+            person = ldap_sync_from_user(user, attrs)
 
         logger.info("Successfully imported user %s" % uid)
