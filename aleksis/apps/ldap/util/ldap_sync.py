@@ -9,6 +9,7 @@ from django.db.models import fields
 from django.utils.translation import gettext as _
 
 from constance import config
+from tqdm import tqdm
 
 
 logger = logging.getLogger(__name__)
@@ -198,7 +199,7 @@ def ldap_sync_from_groups(group_infos):
 
     # Resolve Group objects from LDAP group objects
     group_objects = []
-    for ldap_group in group_infos:
+    for ldap_group in tqdm(group_infos):
         # Skip group if one of the name fields is missing
         if config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME not in ldap_group[1]:
             logger.error("LDAP group with DN %s does not have field %s" % (
@@ -273,7 +274,7 @@ def mass_ldap_import():
 
     # Synchronise user data for all found users
     ldap_users = backend.settings.USER_SEARCH.execute(connection, {"user": "*"}, escape=False)
-    for dn, attrs in ldap_users:
+    for dn, attrs in tqdm(ldap_users):
         uid = attrs[uid_field][0]
 
         # Prepare an empty LDAPUser object with the target username
