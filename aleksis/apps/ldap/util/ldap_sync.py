@@ -343,3 +343,5 @@ def mass_ldap_import():
                 group.owners.set(owners)
             group.save()
             logger.info("Set group members of group %s" % str(group))
+
+    logger.info("Commiting transaction; this can take some time.")
