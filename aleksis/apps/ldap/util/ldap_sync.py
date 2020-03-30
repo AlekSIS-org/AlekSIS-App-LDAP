@@ -293,6 +293,8 @@ def mass_ldap_import():
 
         # Find out whether the User object would be created, but do not save
         user, created = backend.get_or_build_user(uid, ldap_user)
+        if created:
+            user.save()
 
         if created or config.LDAP_SYNC_ON_UPDATE:
             try:
