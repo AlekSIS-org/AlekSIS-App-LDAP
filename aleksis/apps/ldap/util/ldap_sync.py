@@ -43,7 +43,7 @@ def from_ldap(value, field):
     from ldapdb.models.fields import datetime_from_ldap  # noqa
 
     # Pre-convert DateTimeField and DateField due to ISO 8601 limitations in RFC 4517
-    if type(field) in (fields.DateField, fields.DateTimeField):
+    if isinstance(field, (fields.DateField, fields.DateTimeField)):
         # Be opportunistic, but keep old value if conversion fails
         value = datetime_from_ldap(value) or value
 
