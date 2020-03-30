@@ -14,6 +14,11 @@ from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
+TQDM_DEFAULTS = {
+ "disable": None,
+ "unit": "obj",
+ "dynamic_ncols": True,
+}
 
 def setting_name_from_field(model, field):
     """ Generate a constance setting name from a model field """
@@ -206,7 +211,7 @@ def ldap_sync_from_groups(group_infos):
 
     # Resolve Group objects from LDAP group objects
     group_objects = []
-    for ldap_group in tqdm(group_infos):
+    for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
         if config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME not in ldap_group[1]:
@@ -285,7 +290,7 @@ def mass_ldap_import():
 
     # Synchronise user data for all found users
     ldap_users = backend.settings.USER_SEARCH.execute(connection, {"user": "*"}, escape=False)
-    for dn, attrs in tqdm(ldap_users):
+    for dn, attrs in tqdm(ldap_users, desc="Sync. user infos", **TQDM_DEFAULTS):
         uid = attrs[uid_field][0]
 
         # Prepare an empty LDAPUser object with the target username
@@ -317,7 +322,7 @@ def mass_ldap_import():
         member_attr = getattr(backend.settings.GROUP_TYPE, "member_attr", "memberUid")
         owner_attr = config.LDAP_GROUP_SYNC_OWNER_ATTR
 
-        for group, ldap_group in tqdm(zip(group_objects, ldap_groups)):
+        for group, ldap_group in tqdm(zip(group_objects, ldap_groups), desc="Sync. group members", total=len(group_objects), **TQDM_DEFAULTS):
             dn, attrs = ldap_group
             ldap_members = [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
 
