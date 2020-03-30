@@ -168,7 +168,7 @@ def ldap_sync_from_user(user, dn, attrs):
         person.user = user
         logger.info("%s person %s linked to user %s" % ("New" if created else "Existing", str(person), user.username))
 
-    person.ldap_dn = dn
+    person.ldap_dn = dn.lower()
     if not created:
         person.first_name = user.first_name
         person.last_name = user.last_name
@@ -242,7 +242,7 @@ def ldap_sync_from_groups(group_infos):
         try:
             with transaction.atomic():
                 group, created = Group.objects.update_or_create(
-                    ldap_dn = ldap_group[0],
+                    ldap_dn = ldap_group[0].lower(),
                     defaults = {
                         "short_name": short_name,
                         "name": name
@@ -316,7 +316,7 @@ def mass_ldap_import():
 
         for group, ldap_group in tqdm(zip(group_objects, ldap_groups)):
             dn, attrs = ldap_group
-            ldap_members = attrs[member_attr]
+            ldap_members = [_.lower() for _ in attrs[member_attr]]
 
             if member_attr.lower() == "memberUid":
                 members = Person.objects.filter(user__username__in=ldap_members)
