@@ -317,7 +317,7 @@ def mass_ldap_import():
 
         for group, ldap_group in tqdm(zip(group_objects, ldap_groups)):
             dn, attrs = ldap_group
-            ldap_members = [_.lower() for _ in attrs[member_attr]]
+            ldap_members = [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
 
             if member_attr.lower() == "memberUid":
                 members = Person.objects.filter(user__username__in=ldap_members)
