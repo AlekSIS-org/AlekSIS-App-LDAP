@@ -141,7 +141,7 @@ def ldap_sync_from_user(user, dn, attrs):
     Person = apps.get_model("core", "Person")
 
     # Check if there is an existing person connected to the user.
-    if Person.objects.filter(user=user).exists():
+    if Person.objects.filter(user__username=user.username).exists():
         person = user.person
         created = False
         logger.info("Existing person %s already linked to user %s" % (str(person), user.username))
