@@ -1,3 +1,4 @@
+import io
 import logging
 import re
 
@@ -6,6 +7,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import DataError, IntegrityError, transaction
 from django.db.models import fields
+from django.db.models.fields.files import FieldFile, FileField
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 from constance import config
@@ -33,7 +36,13 @@ def syncable_fields(model):
         field.editable and not field.auto_created and not field.is_relation)]
 
 
-def from_ldap(value, field):
+def ldap_field_to_filename(dn, fieldname):
+    """ Generate a reproducible filename from a DN and a field name """
+
+    return "%s__%s" % (slugify(dn), slugify(fieldname))
+
+
+def from_ldap(value, instance, field, dn, ldap_field):
     """ Convert an LDAP value to the Python type of the target field
 
     This conversion is prone to error because LDAP deliberately breaks
@@ -46,6 +55,15 @@ def from_ldap(value, field):
     if isinstance(field, (fields.DateField, fields.DateTimeField)):
         # Be opportunistic, but keep old value if conversion fails
         value = datetime_from_ldap(value) or value
+    elif isinstance(field, FileField):
+        name = ldap_field_to_filename(dn, ldap_field)
+        content = File(io.BytesIO(value))
+
+        # Pre-save field file instance
+        fieldfile = getattr(instance, field.attname)
+        fieldfile.save(name, content)
+
+        return fieldfile
 
     # Finally, use field's conversion method as default
     return field.to_python(value)
@@ -194,7 +212,7 @@ def ldap_sync_from_user(user, dn, attrs):
             value = apply_templates(value, patterns, templates)
 
             # Opportunistically convert LDAP string value to Python object
-            value = from_ldap(value, field)
+            value = from_ldap(value, person, field, dn, ldap_field)
 
             setattr(person, field.name, value)
             logger.debug("Field %s set to %s for %s" % (field.name, str(value), str(person)))
