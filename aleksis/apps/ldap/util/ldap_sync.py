@@ -313,6 +313,7 @@ def mass_ldap_import():
     # Synchronise group memberships now
     if config.ENABLE_LDAP_GROUP_SYNC:
         member_attr = getattr(backend.settings.GROUP_TYPE, "member_attr", "memberUid")
+        owner_attr = config.LDAP_GROUP_SYNC_OWNER_ATTR
 
         for group, ldap_group in tqdm(zip(group_objects, ldap_groups)):
             dn, attrs = ldap_group
@@ -323,6 +324,15 @@ def mass_ldap_import():
             else:
                 members = Person.objects.filter(ldap_dn__in=ldap_members)
 
+            if config.LDAP_GROUP_SYNC_OWNER_ATTR:
+                ldap_owners = [_.lower() for _ in attrs[owner_attr]] if owner_attr in attrs else []
+                if config.LDAP_GROUP_SYNC_OWNER_ATTR_TYPE == "uid":
+                    owners = Person.objects.filter(user__username__in=ldap_owners)
+                elif config.LDAP_GROUP_SYNC_OWNER_ATTR_TYPE == "dn":
+                    owners = Person.objects.filter(ldap_dn__in=ldap_owners)
+
             group.members.set(members)
+            if config.LDAP_GROUP_SYNC_OWNER_ATTR:
+                group.owners.set(owners)
             group.save()
             logger.info("Set group members of group %s" % str(group))
