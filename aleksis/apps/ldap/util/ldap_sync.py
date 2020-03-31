@@ -315,10 +315,13 @@ def mass_ldap_import():
         # Prepare an empty LDAPUser object with the target username
         ldap_user = _LDAPUser(backend, username=uid)
 
-        # Find out whether the User object would be created, but do not save
+        # Get existing or new User object and pre-populate
         user, created = backend.get_or_build_user(uid, ldap_user)
-        if created:
-            user.save()
+        ldap_user._user = user
+        ldap_user._attrs = attrs
+        ldap_user._dn = dn
+        ldap_user._populate_user_from_attributes()
+        user.save()
 
         if created or config.LDAP_SYNC_ON_UPDATE:
             try:
