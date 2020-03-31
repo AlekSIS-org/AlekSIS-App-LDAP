@@ -141,7 +141,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
             # Get groups from LDAP
             groups = instance.ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
-            group_objects = get_ldap_groups(group_infos)
+            group_objects = ldap_sync_from_groups(group_infos)
 
             # Replace linked groups of logged-in user completely
             person.member_of.set(group_objects)
