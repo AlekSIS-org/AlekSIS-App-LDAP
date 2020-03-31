@@ -5,6 +5,7 @@ import re
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files import File
 from django.db import DataError, IntegrityError, transaction
 from django.db.models import fields
 from django.db.models.fields.files import FieldFile, FileField
