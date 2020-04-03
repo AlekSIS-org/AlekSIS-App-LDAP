@@ -3,55 +3,57 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-01 13:24+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2020-04-27 13:05+0000\n"
+"Last-Translator: Jonathan Weth <teckids@jonathanweth.de>\n"
+"Language-Team: German <https://translate.edugit.org/projects/aleksis/"
+"aleksis-app-ldap/de/>\n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.0.1\n"
 
 #: model_extensions.py:8 model_extensions.py:9
 msgid "LDAP Distinguished Name"
-msgstr ""
+msgstr "LDAP Distinguished Name (DN)"
 
 #: settings.py:11
 msgid "Match only on email"
-msgstr ""
+msgstr "Zuordnen nur über die E-Mail-Adresse"
 
 #: settings.py:12
 msgid "Match only on name"
-msgstr ""
+msgstr "Zuordnen nur über den Namen"
 
 #: settings.py:13
 msgid "Match on email and name"
-msgstr ""
+msgstr "Zuordnen über die E-Mail-Adresse und den Namen"
 
 #: settings.py:22
 msgid "Distinguished Name"
-msgstr ""
+msgstr "Distinguished Name (DN)"
 
 #: settings.py:23
 msgid "UID"
-msgstr ""
+msgstr "UID"
 
 #: settings.py:30
 msgid "Enable ldap sync"
-msgstr ""
+msgstr "LDAP-Synchronisation aktivieren"
 
 #: settings.py:31
 msgid "Also sync if user updates"
-msgstr ""
+msgstr "Auch synchronisieren, wenn der Nutzer aktualisiert wird"
 
 #: settings.py:32
 msgid "Create missing persons for LDAP users"
-msgstr ""
+msgstr "Fehlende Personen für LDAP-Nutzer erstellen"
 
 #: settings.py:35
 msgid "LDAP sync matching fields"
@@ -59,11 +61,11 @@ msgstr ""
 
 #: settings.py:38
 msgid "Enable ldap group sync"
-msgstr ""
+msgstr "LDAP-Synchronisation von Gruppen aktivieren"
 
 #: settings.py:39
 msgid "Field for short name of group"
-msgstr ""
+msgstr "Feld für den Kurznamen der Gruppe"
 
 #: settings.py:40
 msgid ""
