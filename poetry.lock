@@ -16,10 +16,12 @@ django-any-js = "^1.0"
 django-bleach = "^0.6.1"
 django-ckeditor = "^5.8.0"
 django-colorfield = "^0.2.1"
+django-dbbackup = "^3.3.0"
 django-debug-toolbar = "^2.0"
 django-easy-audit = "^1.2rc1"
 django-filter = "^2.2.0"
 django-hattori = "^0.2"
+django-haystack = "3.0b1"
 django-image-cropping = "^1.2"
 django-impersonate = "^1.4"
 django-ipware = "^2.1"
@@ -43,9 +45,11 @@ django_widget_tweaks = "^1.4.5"
 easy-thumbnails = "^2.6"
 html2text = "^2020.0.0"
 libsass = "^0.19.2"
+license-expression = "^1.2"
 psycopg2 = "^2.8"
 python-memcached = "^1.59"
 requests = "^2.22"
+spdx-license-list = "^0.4.0"
 
 [package.dependencies.django-constance]
 extras = ["database"]
@@ -64,7 +68,7 @@ extras = ["yaml", "toml", "ini"]
 version = "^2.0"
 
 [package.extras]
-celery = ["Celery (^4.4.0)", "django-celery-results (^1.1.2)", "django-celery-beat (^2.0.0)", "django-celery-email (^3.0.0)"]
+celery = ["Celery (^4.4.0)", "django-celery-results (^1.1.2)", "django-celery-beat (^2.0.0)", "django-celery-email (^3.0.0)", "celery-haystack (^0.3.1)"]
 ldap = ["django-auth-ldap (^2.0)"]
 
 [package.source]
@@ -120,6 +124,14 @@ version = "3.1.4"
 [package.dependencies]
 six = ">=1.9.0"
 webencodings = "*"
+
+[[package]]
+category = "main"
+description = "Define boolean algebras, create and parse boolean expressions and create custom boolean DSL."
+name = "boolean.py"
+optional = false
+python-versions = "*"
+version = "3.7"
 
 [[package]]
 category = "main"
@@ -287,6 +299,19 @@ redis = ["redis"]
 
 [[package]]
 category = "main"
+description = "Management commands to help backup and restore a project database and media"
+name = "django-dbbackup"
+optional = false
+python-versions = "*"
+version = "3.3.0"
+
+[package.dependencies]
+Django = ">=1.5"
+pytz = "*"
+six = "*"
+
+[[package]]
+category = "main"
 description = "A configurable set of panels that display various debug information about the current request/response."
 name = "django-debug-toolbar"
 optional = false
@@ -344,6 +369,17 @@ Faker = ">=0.8.13"
 django-bulk-update = ">=2.2.0"
 six = "*"
 tqdm = ">=4.23.4"
+
+[[package]]
+category = "main"
+description = "Pluggable search for Django."
+name = "django-haystack"
+optional = false
+python-versions = "*"
+version = "3.0b1"
+
+[package.dependencies]
+Django = ">=2.2"
 
 [[package]]
 category = "main"
@@ -440,7 +476,7 @@ description = "An implementation of memoization technique for Django."
 name = "django-memoize"
 optional = false
 python-versions = "*"
-version = "2.2.1"
+version = "2.3.0"
 
 [package.dependencies]
 django = "*"
@@ -730,6 +766,17 @@ six = "*"
 
 [[package]]
 category = "main"
+description = "license-expression is small utility library to parse, compare, simplify and normalize license expressions (such as SPDX license expressions) using boolean logic."
+name = "license-expression"
+optional = false
+python-versions = "*"
+version = "1.2"
+
+[package.dependencies]
+"boolean.py" = ">=3.6,<4.0.0"
+
+[[package]]
+category = "main"
 description = "Python version of Google's common library for parsing, formatting, storing and validating international phone numbers."
 name = "phonenumbers"
 optional = false
@@ -799,7 +846,7 @@ description = "Add .env support to your django/flask apps in development and dep
 name = "python-dotenv"
 optional = false
 python-versions = "*"
-version = "0.12.0"
+version = "0.13.0"
 
 [package.extras]
 cli = ["click (>=5.0)"]
@@ -897,6 +944,14 @@ version = "1.9.5"
 
 [[package]]
 category = "main"
+description = "A simple tool/library for working with SPDX license definitions."
+name = "spdx-license-list"
+optional = false
+python-versions = "*"
+version = "0.4.0"
+
+[[package]]
+category = "main"
 description = "Non-validating SQL parser"
 name = "sqlparse"
 optional = false
@@ -936,11 +991,11 @@ description = "HTTP library with thread-safe connection pooling, file post, and 
 name = "urllib3"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
-version = "1.25.8"
+version = "1.25.9"
 
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
-secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
+secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=0.14)", "ipaddress"]
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7,<2.0)"]
 
 [[package]]
@@ -973,6 +1028,10 @@ beautifulsoup4 = [
 bleach = [
     {file = "bleach-3.1.4-py2.py3-none-any.whl", hash = "sha256:cc8da25076a1fe56c3ac63671e2194458e0c4d9c7becfd52ca251650d517903c"},
     {file = "bleach-3.1.4.tar.gz", hash = "sha256:e78e426105ac07026ba098f04de8abe9b6e3e98b5befbf89b51a5ef0a4292b03"},
+]
+"boolean.py" = [
+    {file = "boolean.py-3.7-py2.py3-none-any.whl", hash = "sha256:82ae181f9c85cb5c893a5a4daba9f24d60b538a7dd27fd0c6752a77eba4fbeff"},
+    {file = "boolean.py-3.7.tar.gz", hash = "sha256:bd19b412435611ecc712603d0fd7d0e280e24698e7a6e3d5f610473870c5dd1e"},
 ]
 calendarweek = [
     {file = "calendarweek-0.4.5-py3-none-any.whl", hash = "sha256:b35fcc087073969d017cede62a7295bcd714a1304bcb4c4e2b0f23acb0265fb1"},
@@ -1031,6 +1090,9 @@ django-colorfield = [
 django-constance = [
     {file = "django-constance-2.6.0.tar.gz", hash = "sha256:12d827f9d5552ee39884fb6fb356f231f32b1ab8958acc715e3d1a6ecf913653"},
 ]
+django-dbbackup = [
+    {file = "django-dbbackup-3.3.0.tar.gz", hash = "sha256:bb109735cae98b64ad084e5b461b7aca2d7b39992f10c9ed9435e3ebb6fb76c8"},
+]
 django-debug-toolbar = [
     {file = "django-debug-toolbar-2.2.tar.gz", hash = "sha256:eabbefe89881bbe4ca7c980ff102e3c35c8e8ad6eb725041f538988f2f39a943"},
     {file = "django_debug_toolbar-2.2-py3-none-any.whl", hash = "sha256:ff94725e7aae74b133d0599b9bf89bd4eb8f5d2c964106e61d11750228c8774c"},
@@ -1050,6 +1112,10 @@ django-formtools = [
 django-hattori = [
     {file = "django-hattori-0.2.1.tar.gz", hash = "sha256:6953d40881317252f19f62c4e7fe8058924b852c7498bc42beb7bc4d268c252c"},
     {file = "django_hattori-0.2.1-py2.py3-none-any.whl", hash = "sha256:e529ed7af8fc34a0169c797c477672b687a205a56f3f5206f90c260acb83b7ac"},
+]
+django-haystack = [
+    {file = "django-haystack-3.0b1.tar.gz", hash = "sha256:9dba64f5c76cf147ac382d4a4a270f30d30a45a3a7a1738a9d05c96d18777c07"},
+    {file = "django_haystack-3.0b1-py3-none-any.whl", hash = "sha256:b83705e1cf8141cd1755fc6683ac65fea4e1281f4b4306bc9224af96495b0df3"},
 ]
 django-image-cropping = [
     {file = "django-image-cropping-1.4.0.tar.gz", hash = "sha256:6cc4a6bd8901e69b710caceea29b942fdb202da26626313cd9271ae989a83a52"},
@@ -1085,7 +1151,7 @@ django-material = [
     {file = "django_material-1.6.3-py2.py3-none-any.whl", hash = "sha256:502dc88c2f61f190fdc401666e83b47da00cbda98477af6ed8b7d43944ce6407"},
 ]
 django-memoize = [
-    {file = "django-memoize-2.2.1.tar.gz", hash = "sha256:7428e19cb17009ea51120420101a239d83bdf4064e5c72ca8c3dfa9656033f24"},
+    {file = "django-memoize-2.3.0.tar.gz", hash = "sha256:85decffbef7d38ffc569dc96527f598e6677bbc01ce29adf722b051da7efd4be"},
 ]
 django-menu-generator = [
     {file = "django-menu-generator-1.0.4.tar.gz", hash = "sha256:ce71a5055c16933c8aff64fb36c21e5cf8b6d505733aceed1252f8b99369a378"},
@@ -1181,6 +1247,10 @@ libsass = [
     {file = "libsass-0.19.4-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:6a51393d75f6e3c812785b0fa0b7d67c54258c28011921f204643b55f7355ec0"},
     {file = "libsass-0.19.4.tar.gz", hash = "sha256:8b5b6d1a7c4ea1d954e0982b04474cc076286493f6af2d0a13c2e950fbe0be95"},
 ]
+license-expression = [
+    {file = "license-expression-1.2.tar.gz", hash = "sha256:7960e1dfdf20d127e75ead931476f2b5c7556df05b117a73880b22ade17d1abc"},
+    {file = "license_expression-1.2-py2.py3-none-any.whl", hash = "sha256:6d97906380cecfc758a77f6d38c6760f2afade7e83d2b8295e234fe21f486fb8"},
+]
 phonenumbers = [
     {file = "phonenumbers-8.12.1-py2.py3-none-any.whl", hash = "sha256:bebf881ef0e775b93062fbd107bf164b5baef877a7b8f702e93a9a5d24ae4065"},
     {file = "phonenumbers-8.12.1.tar.gz", hash = "sha256:59ae9cb25fb03027c9f2bf5584098e699be7eca12c443838b83752956be15cda"},
@@ -1264,8 +1334,8 @@ python-dateutil = [
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
 python-dotenv = [
-    {file = "python-dotenv-0.12.0.tar.gz", hash = "sha256:92b3123fb2d58a284f76cc92bfe4ee6c502c32ded73e8b051c4f6afc8b6751ed"},
-    {file = "python_dotenv-0.12.0-py2.py3-none-any.whl", hash = "sha256:81822227f771e0cab235a2939f0f265954ac4763cafd806d845801c863bf372f"},
+    {file = "python-dotenv-0.13.0.tar.gz", hash = "sha256:3b9909bc96b0edc6b01586e1eed05e71174ef4e04c71da5786370cebea53ad74"},
+    {file = "python_dotenv-0.13.0-py2.py3-none-any.whl", hash = "sha256:25c0ff1a3e12f4bde8d592cc254ab075cfe734fc5dd989036716fd17ee7e5ec7"},
 ]
 python-ldap = [
     {file = "python-ldap-3.2.0.tar.gz", hash = "sha256:7d1c4b15375a533564aad3d3deade789221e450052b21ebb9720fb822eccdb8e"},
@@ -1307,6 +1377,10 @@ soupsieve = [
     {file = "soupsieve-1.9.5-py2.py3-none-any.whl", hash = "sha256:bdb0d917b03a1369ce964056fc195cfdff8819c40de04695a80bc813c3cfa1f5"},
     {file = "soupsieve-1.9.5.tar.gz", hash = "sha256:e2c1c5dee4a1c36bcb790e0fabd5492d874b8ebd4617622c4f6a731701060dda"},
 ]
+spdx-license-list = [
+    {file = "spdx_license_list-0.4.0-py3-none-any.whl", hash = "sha256:e5c2d1efc4067ff83609a200c731db6c656fdfd26144ac8b50755d6c72515453"},
+    {file = "spdx_license_list-0.4.0.tar.gz", hash = "sha256:f8b5eeda2a1c88d8ce15f6324d5a6128a462932a2e55b032f017ac9a0e61f1c7"},
+]
 sqlparse = [
     {file = "sqlparse-0.3.1-py2.py3-none-any.whl", hash = "sha256:022fb9c87b524d1f7862b3037e541f68597a730a8843245c349fc93e1643dc4e"},
     {file = "sqlparse-0.3.1.tar.gz", hash = "sha256:e162203737712307dfe78860cc56c8da8a852ab2ee33750e33aeadf38d12c548"},
@@ -1325,8 +1399,8 @@ tqdm = [
     {file = "tqdm-4.45.0.tar.gz", hash = "sha256:00339634a22c10a7a22476ee946bbde2dbe48d042ded784e4d88e0236eca5d81"},
 ]
 urllib3 = [
-    {file = "urllib3-1.25.8-py2.py3-none-any.whl", hash = "sha256:2f3db8b19923a873b3e5256dc9c2dedfa883e33d87c690d9c7913e1f40673cdc"},
-    {file = "urllib3-1.25.8.tar.gz", hash = "sha256:87716c2d2a7121198ebcb7ce7cccf6ce5e9ba539041cfbaeecfb641dc0bf6acc"},
+    {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},
+    {file = "urllib3-1.25.9.tar.gz", hash = "sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527"},
 ]
 webencodings = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
