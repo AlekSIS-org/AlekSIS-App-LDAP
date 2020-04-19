@@ -9,6 +9,15 @@ class LDAPConfig(AppConfig):
     name = "aleksis.apps.ldap"
     verbose_name = "AlekSIS — LDAP (General LDAP import/export)"
 
+    urls = {
+        "Repository": "https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP/",
+    }
+    licence = "EUPL-1.2+"
+    copyright = (
+        ([2020], "Dominik George", "dominik.george@teckids.org"),
+        ([2020], "Tom Teichler", "tom.teichler@teckids.org"),
+    )
+
     def ready(self) -> None:
         super().ready()
 
