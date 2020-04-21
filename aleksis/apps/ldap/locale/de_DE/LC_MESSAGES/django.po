@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-01 13:24+0200\n"
 "PO-Revision-Date: 2020-04-27 13:05+0000\n"
-"Last-Translator: Jonathan Weth <teckids@jonathanweth.de>\n"
+"Last-Translator: Frank Poetzsch-Heffter <p-h@katharineum.de>\n"
 "Language-Team: German <https://translate.edugit.org/projects/aleksis/"
 "aleksis-app-ldap/de/>\n"
 "Language: de_DE\n"
@@ -72,43 +72,51 @@ msgid ""
 "Regular expression to match LDAP value for group short name against, e.g. "
 "class_(?P<class>.*); separate multiple patterns by |"
 msgstr ""
+"Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Kurznamen der "
+"Gruppe, z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
 
 #: settings.py:41
 msgid ""
 "Replacement template to apply to group short name, e.g. \\g<class>; separate "
 "multiple templates by |"
 msgstr ""
+"Ersatzvorlage zur Anwendung auf Gruppenkurznamen, z.B. \\g<class>; trenne "
+"mehrere Vorlagen durch |"
 
 #: settings.py:42
 msgid "Field for name of group"
-msgstr ""
+msgstr "Feld für Gruppennamen"
 
 #: settings.py:43
 msgid ""
 "Regular expression to match LDAP value for group name against, e.g. class_(?"
 "P<class>.*); separate multiple patterns by |"
 msgstr ""
+" Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Gruppennamen mit "
+"z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
 
 #: settings.py:44
 msgid ""
 "Replacement template to apply to group name, e.g. \\g<class>; separate "
 "multiple templates by |"
 msgstr ""
+"Ersatzvorlage zur Anwendung auf den Gruppennamen, z.B. \\g<class>; trenne "
+"mehrere Vorlagen durch |"
 
 #: settings.py:45
 msgid "LDAP field with dn of group owner"
-msgstr ""
+msgstr "LDAP Feld mit dn vom Gruppeneigentümer"
 
 #: settings.py:46
 msgid "Type of data in the ldap_field. Either DN or UID"
-msgstr ""
+msgstr "Art der Daten im ldap_field. Entweder DN oder UID"
 
 #: util/ldap_sync.py:85
 #, python-format
 msgid "Regular expression to match LDAP value for %s against"
-msgstr ""
+msgstr "Regulärer Ausdruck zum Abgleich des LDAP-Wertes für %s gegen"
 
 #: util/ldap_sync.py:86
 #, python-format
 msgid "Replacement template to apply to %s"
-msgstr ""
+msgstr "Ersatzvorlage zur Anwendung auf %s"
