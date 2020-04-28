@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-01 13:24+0200\n"
+"POT-Creation-Date: 2020-04-28 13:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,15 +66,11 @@ msgid "Field for short name of group"
 msgstr ""
 
 #: settings.py:40
-msgid ""
-"Regular expression to match LDAP value for group short name against, e.g. "
-"class_(?P<class>.*); separate multiple patterns by |"
+msgid "Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
 msgstr ""
 
 #: settings.py:41
-msgid ""
-"Replacement template to apply to group short name, e.g. \\g<class>; separate "
-"multiple templates by |"
+msgid "Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |"
 msgstr ""
 
 #: settings.py:42
@@ -82,15 +78,11 @@ msgid "Field for name of group"
 msgstr ""
 
 #: settings.py:43
-msgid ""
-"Regular expression to match LDAP value for group name against, e.g. class_(?"
-"P<class>.*); separate multiple patterns by |"
+msgid "Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
 msgstr ""
 
 #: settings.py:44
-msgid ""
-"Replacement template to apply to group name, e.g. \\g<class>; separate "
-"multiple templates by |"
+msgid "Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |"
 msgstr ""
 
 #: settings.py:45

@@ -7,11 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-01 13:24+0200\n"
+"POT-Creation-Date: 2020-04-28 13:31+0000\n"
 "PO-Revision-Date: 2020-04-27 13:05+0000\n"
 "Last-Translator: Frank Poetzsch-Heffter <p-h@katharineum.de>\n"
-"Language-Team: German <https://translate.edugit.org/projects/aleksis/"
-"aleksis-app-ldap/de/>\n"
+"Language-Team: German <https://translate.edugit.org/projects/aleksis/aleksis-app-ldap/de/>\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,40 +67,24 @@ msgid "Field for short name of group"
 msgstr "Feld für den Kurznamen der Gruppe"
 
 #: settings.py:40
-msgid ""
-"Regular expression to match LDAP value for group short name against, e.g. "
-"class_(?P<class>.*); separate multiple patterns by |"
-msgstr ""
-"Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Kurznamen der "
-"Gruppe, z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
+msgid "Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+msgstr "Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Kurznamen der Gruppe, z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
 
 #: settings.py:41
-msgid ""
-"Replacement template to apply to group short name, e.g. \\g<class>; separate "
-"multiple templates by |"
-msgstr ""
-"Ersatzvorlage zur Anwendung auf Gruppenkurznamen, z.B. \\g<class>; trenne "
-"mehrere Vorlagen durch |"
+msgid "Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |"
+msgstr "Ersatzvorlage zur Anwendung auf Gruppenkurznamen, z.B. \\g<class>; trenne mehrere Vorlagen durch |"
 
 #: settings.py:42
 msgid "Field for name of group"
 msgstr "Feld für Gruppennamen"
 
 #: settings.py:43
-msgid ""
-"Regular expression to match LDAP value for group name against, e.g. class_(?"
-"P<class>.*); separate multiple patterns by |"
-msgstr ""
-" Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Gruppennamen mit "
-"z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
+msgid "Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+msgstr " Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Gruppennamen mit z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
 
 #: settings.py:44
-msgid ""
-"Replacement template to apply to group name, e.g. \\g<class>; separate "
-"multiple templates by |"
-msgstr ""
-"Ersatzvorlage zur Anwendung auf den Gruppennamen, z.B. \\g<class>; trenne "
-"mehrere Vorlagen durch |"
+msgid "Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |"
+msgstr "Ersatzvorlage zur Anwendung auf den Gruppennamen, z.B. \\g<class>; trenne mehrere Vorlagen durch |"
 
 #: settings.py:45
 msgid "LDAP field with dn of group owner"
