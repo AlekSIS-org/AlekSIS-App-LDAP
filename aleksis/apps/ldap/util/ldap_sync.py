@@ -12,9 +12,13 @@ from django.db.models.fields.files import FieldFile, FileField
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from constance import config
+from dynamic_preferences.types import StringPreference
 from tqdm import tqdm
 
+from aleksis.core.registries import site_preferences_registry
+from aleksis.core.util.core_helpers import get_site_preferences
+
+from ..preferences import ldap as section_ldap
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +29,9 @@ TQDM_DEFAULTS = {
 }
 
 def setting_name_from_field(model, field):
-    """ Generate a constance setting name from a model field """
+    """ Generate a setting name from a model field """
 
-    return "LDAP_ADDITIONAL_FIELD_%s_%s" % (model._meta.label, field.name)
+    return "additional_field_%s_%s" % (model._meta.label, field.name)
 
 
 def syncable_fields(model):
@@ -70,27 +74,38 @@ def from_ldap(value, instance, field, dn, ldap_field):
     return field.to_python(value)
 
 
-def update_constance_config_fields():
+def update_dynamic_preferences():
     """ Auto-generate sync field settings from models """
 
     Person = apps.get_model("core", "Person")
     for model in (Person,):
         # Collect fields that are matchable
-        setting_names = []
         for field in syncable_fields(model):
             setting_name = setting_name_from_field(model, field)
-            setting_desc = field.verbose_name
 
-            settings.CONSTANCE_CONFIG[setting_name] = ("", setting_desc, str)
-            settings.CONSTANCE_CONFIG[setting_name + "_RE"] = ("", _("Regular expression to match LDAP value for %s against") % setting_desc, str)
-            settings.CONSTANCE_CONFIG[setting_name + "_REPLACE"] = ("", _("Replacement template to apply to %s") % setting_desc, str)
-
-            setting_names += [setting_name, setting_name + "_RE", setting_name + "_REPLACE"]
-
-        # Add separate constance section if settings were generated
-        if setting_names:
-            fieldset_name = "LDAP-Sync: Additional fields for %s" % model._meta.verbose_name
-            settings.CONSTANCE_CONFIG_FIELDSETS[fieldset_name] = setting_names
+            @site_preferences_registry.register
+            class _GeneratedPreference(StringPreference):
+                section = section_ldap
+                name = setting_name
+                verbose_name = _("LDAP field for %s on %s") % (field.verbose_name, model._meta.label)
+                required = False
+                default = ""
+            
+            @site_preferences_registry.register
+            class _GeneratedPreferenceRe(StringPreference):
+                section = section_ldap
+                name = setting_name + "_re"
+                verbose_name = _("Regular expression to match LDAP value for %s on %s against") % (field.verbose_name, model._meta.label)
+                required = False
+                default = ""
+            
+            @site_preferences_registry.register
+            class _GeneratedPreferenceReplace(StringPreference):
+                section = section_ldap
+                name = setting_name + "_replace"
+                verbose_name = _("Replacement template to apply to %s on %s") % (field.verbose_name, model._meta.label)
+                required = False
+                default = ""
 
 
 def apply_templates(value, patterns, templates, separator="|"):
@@ -123,7 +138,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 
     Person = apps.get_model("core", "Person")
 
-    if config.ENABLE_LDAP_SYNC and (created or config.LDAP_SYNC_ON_UPDATE) and hasattr(instance, "ldap_user"):
+    if get_site_preferences()["ldap__enable_sync"] and (created or get_site_preferences()["ldap__sync_on_update"]) and hasattr(instance, "ldap_user"):
         try:
             with transaction.atomic():
                 person = ldap_sync_from_user(instance, instance.ldap_user.dn, instance.ldap_user.attrs.data)
@@ -137,7 +152,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
             logger.error("Data error while synchronising user %s:\n%s" % (user.username, str(e)))
             return
 
-        if config.ENABLE_LDAP_GROUP_SYNC:
+        if get_site_preferences()["ldap__enable_group_sync"]:
             # Get groups from LDAP
             groups = instance.ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
@@ -174,16 +189,16 @@ def ldap_sync_from_user(user, dn, attrs):
         # Build filter criteria depending on config
         matches = {}
         defaults = {}
-        if "-email" in config.LDAP_MATCHING_FIELDS:
+        if "-email" in get_site_preferences()["ldap__matching_fields"]:
             matches["email"] = user.email
             defaults["first_name"] = user.first_name
             defaults["last_name"] = user.last_name
-        if "-name" in config.LDAP_MATCHING_FIELDS:
+        if "-name" in get_site_preferences()["ldap__matching_fields"]:
             matches["first_name"] = user.first_name
             matches["last_name"] = user.last_name
             defaults["email"] = user.email
 
-        if config.LDAP_SYNC_CREATE_MISSING_PERSONS:
+        if get_site_preferences()["ldap__create_missing_persons"]:
             person, created = Person.objects.get_or_create(**matches, defaults=defaults)
         else:
             person = Person.objects.get(**matches)
@@ -200,16 +215,16 @@ def ldap_sync_from_user(user, dn, attrs):
 
     # Synchronise additional fields if enabled
     for field in syncable_fields(Person):
-        setting_name = setting_name_from_field(Person, field)
+        setting_name = "ldap__" + setting_name_from_field(Person, field)
 
         # Try sync if constance setting for this field is non-empty
-        ldap_field = getattr(config, setting_name, "").lower()
+        ldap_field = get_site_preferences()[setting_name].lower()
         if ldap_field and ldap_field in attrs:
             value = attrs[ldap_field][0]
 
             # Apply regex replace from config
-            patterns = getattr(config, setting_name + "_RE", "")
-            templates = getattr(config, setting_name + "_REPLACE", "")
+            patterns = get_site_preferences()[setting_name + "_re"]
+            templates = get_site_preferences()[setting_name + "_request"]
             value = apply_templates(value, patterns, templates)
 
             # Opportunistically convert LDAP string value to Python object
@@ -233,29 +248,29 @@ def ldap_sync_from_groups(group_infos):
     for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
-        if config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME not in ldap_group[1]:
+        if get_site_preferences()["ldap__group_sync_field_short_name"] not in ldap_group[1]:
             logger.error("LDAP group with DN %s does not have field %s" % (
                 ldap_group[0],
-                config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME
+                get_site_preferences()["ldap__group_sync_field_short_name"]
             ))
             continue
-        if config.LDAP_GROUP_SYNC_FIELD_NAME not in ldap_group[1]:
+        if get_site_preferences()["ldap__group_sync_field_name"] not in ldap_group[1]:
             logger.error("LDAP group with DN %s does not have field %s" % (
                 ldap_group[0],
-                config.LDAP_GROUP_SYNC_FIELD_NAME
+                get_site_preferences()["ldap__group_sync_field_name"]
             ))
             continue
 
         # Apply regex replace from config
         short_name = apply_templates(
-            ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME][0],
-            config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME_RE,
-            config.LDAP_GROUP_SYNC_FIELD_SHORT_NAME_REPLACE
+            ldap_group[1][get_site_preferences()["ldap__group_sync_field_short_name"]][0],
+            get_site_preferences()["ldap__group_sync_field_short_name_re"],
+            get_site_preferences()["ldap__group_sync_field_short_name_replace"]
         )
         name = apply_templates(
-            ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0],
-            config.LDAP_GROUP_SYNC_FIELD_NAME_RE,
-            config.LDAP_GROUP_SYNC_FIELD_NAME_REPLACE
+            ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0],
+            get_site_preferences()["ldap__group_sync_field_name_re"],
+            get_site_preferences()["ldap__group_sync_field_name_replace"]
         )
 
         # Shorten names to fit into model fields
@@ -278,7 +293,7 @@ def ldap_sync_from_groups(group_infos):
         else:
             logger.info("%s LDAP group %s for Django group %s" % (
                 ("Created" if created else "Updated"),
-                ldap_group[1][config.LDAP_GROUP_SYNC_FIELD_NAME][0],
+                ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0],
                 name
             ))
 
@@ -300,7 +315,7 @@ def mass_ldap_import():
     connection = _LDAPUser(backend, "").connection
 
     # Synchronise all groups first
-    if config.ENABLE_LDAP_GROUP_SYNC:
+    if get_site_preferences()["ldap__enable_group_sync"]:
         ldap_groups = backend.settings.GROUP_SEARCH.execute(connection)
         group_objects = ldap_sync_from_groups(ldap_groups)
 
@@ -323,7 +338,7 @@ def mass_ldap_import():
         ldap_user._populate_user_from_attributes()
         user.save()
 
-        if created or config.LDAP_SYNC_ON_UPDATE:
+        if created or get_site_preferences()["ldap__sync_on_update"]:
             try:
                 with transaction.atomic():
                     person = ldap_sync_from_user(user, dn, attrs)
@@ -340,9 +355,9 @@ def mass_ldap_import():
                 logger.info("Successfully imported user %s" % uid)
 
     # Synchronise group memberships now
-    if config.ENABLE_LDAP_GROUP_SYNC:
+    if get_site_preferences()["ldap__enable_group_sync"]:
         member_attr = getattr(backend.settings.GROUP_TYPE, "member_attr", "memberUid")
-        owner_attr = config.LDAP_GROUP_SYNC_OWNER_ATTR
+        owner_attr = get_site_preferences()["ldap__group_sync_owner_attr"]
 
         for group, ldap_group in tqdm(zip(group_objects, ldap_groups), desc="Sync. group members", total=len(group_objects), **TQDM_DEFAULTS):
             dn, attrs = ldap_group
@@ -353,15 +368,15 @@ def mass_ldap_import():
             else:
                 members = Person.objects.filter(ldap_dn__in=ldap_members)
 
-            if config.LDAP_GROUP_SYNC_OWNER_ATTR:
+            if get_site_preferences()["ldap__group_sync_owner_attr"]:
                 ldap_owners = [_.lower() for _ in attrs[owner_attr]] if owner_attr in attrs else []
-                if config.LDAP_GROUP_SYNC_OWNER_ATTR_TYPE == "uid":
+                if get_site_preferences()["ldap__group_sync_owner_attr_type"] == "uid":
                     owners = Person.objects.filter(user__username__in=ldap_owners)
-                elif config.LDAP_GROUP_SYNC_OWNER_ATTR_TYPE == "dn":
+                elif get_site_preferences()["ldap__group_sync_owner_attr_type"] == "dn":
                     owners = Person.objects.filter(ldap_dn__in=ldap_owners)
 
             group.members.set(members)
-            if config.LDAP_GROUP_SYNC_OWNER_ATTR:
+            if get_site_preferences()["ldap__group_sync_owner_attr"]:
                 group.owners.set(owners)
             group.save()
             logger.info("Set group members of group %s" % str(group))

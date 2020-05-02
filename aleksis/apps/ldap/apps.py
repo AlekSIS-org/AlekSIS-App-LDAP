@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 
 from aleksis.core.util.apps import AppConfig
 
-from .util.ldap_sync import ldap_sync_user_on_login, update_constance_config_fields
+from .util.ldap_sync import ldap_sync_user_on_login, update_dynamic_preferences
 
 class LDAPConfig(AppConfig):
     name = "aleksis.apps.ldap"
@@ -21,7 +21,7 @@ class LDAPConfig(AppConfig):
     def ready(self) -> None:
         super().ready()
 
-        update_constance_config_fields()
+        update_dynamic_preferences()
 
         User = get_user_model()
         post_save.connect(ldap_sync_user_on_login, sender=User)
