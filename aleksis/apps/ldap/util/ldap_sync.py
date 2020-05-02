@@ -12,12 +12,13 @@ from django.db.models.fields.files import FieldFile, FileField
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from constance import config
+from dynamic_preferences.types import StringPreference
 from tqdm import tqdm
 
 from aleksis.core.registries import site_preferences_registry
 from aleksis.core.util.core_helpers import get_site_preferences
 
+from ..preferences import ldap as section_ldap
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +29,9 @@ TQDM_DEFAULTS = {
 }
 
 def setting_name_from_field(model, field):
-    """ Generate a constance setting name from a model field """
+    """ Generate a setting name from a model field """
 
-    return "LDAP_ADDITIONAL_FIELD_%s_%s" % (model._meta.label, field.name)
+    return "additional_field_%s_%s" % (model._meta.label, field.name)
 
 
 def syncable_fields(model):
@@ -73,27 +74,38 @@ def from_ldap(value, instance, field, dn, ldap_field):
     return field.to_python(value)
 
 
-def update_constance_config_fields():
+def update_dynamic_preferences():
     """ Auto-generate sync field settings from models """
 
     Person = apps.get_model("core", "Person")
     for model in (Person,):
         # Collect fields that are matchable
-        setting_names = []
         for field in syncable_fields(model):
             setting_name = setting_name_from_field(model, field)
-            setting_desc = field.verbose_name
 
-            settings.CONSTANCE_CONFIG[setting_name] = ("", setting_desc, str)
-            settings.CONSTANCE_CONFIG[setting_name + "_RE"] = ("", _("Regular expression to match LDAP value for %s against") % setting_desc, str)
-            settings.CONSTANCE_CONFIG[setting_name + "_REPLACE"] = ("", _("Replacement template to apply to %s") % setting_desc, str)
-
-            setting_names += [setting_name, setting_name + "_RE", setting_name + "_REPLACE"]
-
-        # Add separate constance section if settings were generated
-        if setting_names:
-            fieldset_name = "LDAP-Sync: Additional fields for %s" % model._meta.verbose_name
-            settings.CONSTANCE_CONFIG_FIELDSETS[fieldset_name] = setting_names
+            @site_preferences_registry.register
+            class _GeneratedPreference(StringPreference):
+                section = section_ldap
+                name = setting_name
+                verbose_name = _("LDAP field for %s on %s") % (field.verbose_name, model._meta.label)
+                required = False
+                default = ""
+            
+            @site_preferences_registry.register
+            class _GeneratedPreferenceRe(StringPreference):
+                section = section_ldap
+                name = setting_name + "_re"
+                verbose_name = _("Regular expression to match LDAP value for %s on %s against") % (field.verbose_name, model._meta.label)
+                required = False
+                default = ""
+            
+            @site_preferences_registry.register
+            class _GeneratedPreferenceReplace(StringPreference):
+                section = section_ldap
+                name = setting_name + "_replace"
+                verbose_name = _("Replacement template to apply to %s on %s") % (field.verbose_name, model._meta.label)
+                required = False
+                default = ""
 
 
 def apply_templates(value, patterns, templates, separator="|"):
@@ -203,16 +215,16 @@ def ldap_sync_from_user(user, dn, attrs):
 
     # Synchronise additional fields if enabled
     for field in syncable_fields(Person):
-        setting_name = setting_name_from_field(Person, field)
+        setting_name = "ldap__" + setting_name_from_field(Person, field)
 
         # Try sync if constance setting for this field is non-empty
-        ldap_field = getattr(config, setting_name, "").lower()
+        ldap_field = get_site_preferences()[setting_name].lower()
         if ldap_field and ldap_field in attrs:
             value = attrs[ldap_field][0]
 
             # Apply regex replace from config
-            patterns = getattr(config, setting_name + "_RE", "")
-            templates = getattr(config, setting_name + "_REPLACE", "")
+            patterns = get_site_preferences()[setting_name + "_re"]
+            templates = get_site_preferences()[setting_name + "_request"]
             value = apply_templates(value, patterns, templates)
 
             # Opportunistically convert LDAP string value to Python object
