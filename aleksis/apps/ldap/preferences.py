@@ -134,3 +134,12 @@ class LDAPGroupSyncOwnerAttrType(ChoicePreference):
         ("dn", _("Distinguished Name")),
         ("uid", _("UID")),
     ]
+
+
+@site_preferences_registry.register
+class LDAPPersonSyncOnLogin(BooleanPreference):
+    section = ldap
+    name = "person_sync_on_login"
+    default = "true"
+    required = False
+    verbose_name = _("Sync LDAP user with person on login")
