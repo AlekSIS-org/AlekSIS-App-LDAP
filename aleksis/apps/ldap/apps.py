@@ -5,6 +5,7 @@ from aleksis.core.util.apps import AppConfig
 
 from .util.ldap_sync import ldap_sync_user_on_login, update_dynamic_preferences
 
+
 class LDAPConfig(AppConfig):
     name = "aleksis.apps.ldap"
     verbose_name = "AlekSIS — LDAP (General LDAP import/export)"

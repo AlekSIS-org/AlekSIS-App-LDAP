@@ -1,12 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 
-from dynamic_preferences.types import BooleanPreference, StringPreference, ChoicePreference
 from dynamic_preferences.preferences import Section
+from dynamic_preferences.types import BooleanPreference, ChoicePreference, StringPreference
 
 from aleksis.core.registries import site_preferences_registry
 
-
-ldap = Section('ldap')
+ldap = Section("ldap")
 
 
 @site_preferences_registry.register
@@ -75,7 +74,9 @@ class LDAPGroupSyncFieldShortNameRE(StringPreference):
     name = "group_sync_field_short_name_re"
     default = ""
     required = False
-    verbose_name = _("Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |")
+    verbose_name = _(
+        "Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+    )
 
 
 @site_preferences_registry.register
@@ -84,7 +85,9 @@ class LDAPGroupSyncFieldShortNameReplace(StringPreference):
     name = "group_sync_field_short_name_replace"
     default = ""
     required = False
-    verbose_name = _("Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |")
+    verbose_name = _(
+        "Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |"
+    )
 
 
 @site_preferences_registry.register
@@ -102,7 +105,9 @@ class LDAPGroupSyncFieldNameRE(StringPreference):
     name = "group_sync_field_name_re"
     default = ""
     required = False
-    verbose_name = _("Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |")
+    verbose_name = _(
+        "Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+    )
 
 
 @site_preferences_registry.register
@@ -111,7 +116,9 @@ class LDAPGroupSyncFieldNameReplace(StringPreference):
     name = "group_sync_field_name_replace"
     default = ""
     required = False
-    verbose_name = _("Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |")
+    verbose_name = _(
+        "Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |"
+    )
 
 
 @site_preferences_registry.register

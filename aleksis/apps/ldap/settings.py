@@ -18,10 +18,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         "django.forms.fields.ChoiceField",
         {
             "widget": "django.forms.Select",
-            "choices": (
-                ("dn", _("Distinguished Name")),
-                ("uid", _("UID")),
-            ),
+            "choices": (("dn", _("Distinguished Name")), ("uid", _("UID")),),
         },
     ],
 }
@@ -30,20 +27,44 @@ CONSTANCE_CONFIG = {
     "ENABLE_LDAP_SYNC": (True, _("Enable ldap sync"), bool),
     "LDAP_SYNC_ON_UPDATE": (True, _("Also sync if user updates"), bool),
     "LDAP_SYNC_CREATE_MISSING_PERSONS": (True, _("Create missing persons for LDAP users"), bool),
-    "LDAP_MATCHING_FIELDS": (
-        None,
-        _("LDAP sync matching fields"),
-        "matching-fields-select",
-    ),
+    "LDAP_MATCHING_FIELDS": (None, _("LDAP sync matching fields"), "matching-fields-select",),
     "ENABLE_LDAP_GROUP_SYNC": (True, _("Enable ldap group sync"), bool),
     "LDAP_GROUP_SYNC_FIELD_SHORT_NAME": ("cn", _("Field for short name of group"), str),
-    "LDAP_GROUP_SYNC_FIELD_SHORT_NAME_RE": ("", _("Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |"), str),
-    "LDAP_GROUP_SYNC_FIELD_SHORT_NAME_REPLACE": ("", _("Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |"), str),
+    "LDAP_GROUP_SYNC_FIELD_SHORT_NAME_RE": (
+        "",
+        _(
+            "Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+        ),
+        str,
+    ),
+    "LDAP_GROUP_SYNC_FIELD_SHORT_NAME_REPLACE": (
+        "",
+        _(
+            "Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |"
+        ),
+        str,
+    ),
     "LDAP_GROUP_SYNC_FIELD_NAME": ("cn", _("Field for name of group"), str),
-    "LDAP_GROUP_SYNC_FIELD_NAME_RE": ("", _("Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |"), str),
-    "LDAP_GROUP_SYNC_FIELD_NAME_REPLACE": ("", _("Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |"), str),
+    "LDAP_GROUP_SYNC_FIELD_NAME_RE": (
+        "",
+        _(
+            "Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+        ),
+        str,
+    ),
+    "LDAP_GROUP_SYNC_FIELD_NAME_REPLACE": (
+        "",
+        _(
+            "Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |"
+        ),
+        str,
+    ),
     "LDAP_GROUP_SYNC_OWNER_ATTR": ("", _("LDAP field with dn of group owner"), str),
-    "LDAP_GROUP_SYNC_OWNER_ATTR_TYPE": ("dn", _("Type of data in the ldap_field. Either DN or UID"), "owner-attr-type"),
+    "LDAP_GROUP_SYNC_OWNER_ATTR_TYPE": (
+        "dn",
+        _("Type of data in the ldap_field. Either DN or UID"),
+        "owner-attr-type",
+    ),
 }
 CONSTANCE_CONFIG_FIELDSETS = {
     "LDAP-Sync settings": (
