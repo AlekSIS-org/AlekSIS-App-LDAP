@@ -15,7 +15,7 @@ class LDAPConfig(AppConfig):
         "Repository": "https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP/",
     }
     licence = "EUPL-1.2+"
-    copyright = (
+    copyright_info = (
         ([2020], "Dominik George", "dominik.george@teckids.org"),
         ([2020], "Tom Teichler", "tom.teichler@teckids.org"),
     )
