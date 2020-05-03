@@ -1,7 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 
 from dynamic_preferences.preferences import Section
-from dynamic_preferences.types import BooleanPreference, ChoicePreference, StringPreference
+from dynamic_preferences.types import (
+    BooleanPreference,
+    ChoicePreference,
+    StringPreference,
+)
 
 from aleksis.core.registries import site_preferences_registry
 
@@ -75,7 +79,8 @@ class LDAPGroupSyncFieldShortNameRE(StringPreference):
     default = ""
     required = False
     verbose_name = _(
-        "Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+        "Regular expression to match LDAP value for group short name against,"
+        "e.g. class_(?P<class>.*); separate multiple patterns by |"
     )
 
 
@@ -86,7 +91,8 @@ class LDAPGroupSyncFieldShortNameReplace(StringPreference):
     default = ""
     required = False
     verbose_name = _(
-        "Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |"
+        "Replacement template to apply to group short name,"
+        "e.g. \\g<class>; separate multiple templates by |"
     )
 
 
@@ -106,7 +112,8 @@ class LDAPGroupSyncFieldNameRE(StringPreference):
     default = ""
     required = False
     verbose_name = _(
-        "Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+        "Regular expression to match LDAP value for group name against,"
+        "e.g. class_(?P<class>.*); separate multiple patterns by |"
     )
 
 
@@ -117,7 +124,8 @@ class LDAPGroupSyncFieldNameReplace(StringPreference):
     default = ""
     required = False
     verbose_name = _(
-        "Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |"
+        "Replacement template to apply to group name,"
+        "e.g. \\g<class>; separate multiple templates by |"
     )
 
 

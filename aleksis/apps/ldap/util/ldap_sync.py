@@ -3,12 +3,10 @@ import logging
 import re
 
 from django.apps import apps
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.db import DataError, IntegrityError, transaction
 from django.db.models import fields
-from django.db.models.fields.files import FieldFile, FileField
+from django.db.models.fields.files import FieldFile
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
@@ -30,14 +28,12 @@ TQDM_DEFAULTS = {
 
 
 def setting_name_from_field(model, field):
-    """ Generate a setting name from a model field """
-
+    """Generate a setting name from a model field."""
     return "additional_field_%s_%s" % (model._meta.label, field.name)
 
 
 def syncable_fields(model):
-    """ Collect all fields that can be synced on a model """
-
+    """Collect all fields that can be synced on a model."""
     return [
         field
         for field in model._meta.fields
@@ -46,18 +42,16 @@ def syncable_fields(model):
 
 
 def ldap_field_to_filename(dn, fieldname):
-    """ Generate a reproducible filename from a DN and a field name """
-
+    """Generate a reproducible filename from a DN and a field name."""
     return "%s__%s" % (slugify(dn), slugify(fieldname))
 
 
 def from_ldap(value, instance, field, dn, ldap_field):
-    """ Convert an LDAP value to the Python type of the target field
+    """Convert an LDAP value to the Python type of the target field
 
     This conversion is prone to error because LDAP deliberately breaks
     standards to cope with ASN.1 limitations.
     """
-
     from ldapdb.models.fields import datetime_from_ldap  # noqa
 
     # Pre-convert DateTimeField and DateField due to ISO 8601 limitations in RFC 4517
@@ -79,8 +73,7 @@ def from_ldap(value, instance, field, dn, ldap_field):
 
 
 def update_dynamic_preferences():
-    """ Auto-generate sync field settings from models """
-
+    """Auto-generate sync field settings from models."""
     Person = apps.get_model("core", "Person")
     for model in (Person,):
         # Collect fields that are matchable
@@ -102,10 +95,9 @@ def update_dynamic_preferences():
             class _GeneratedPreferenceRe(StringPreference):
                 section = section_ldap
                 name = setting_name + "_re"
-                verbose_name = _("Regular expression to match LDAP value for %s on %s against") % (
-                    field.verbose_name,
-                    model._meta.label,
-                )
+                verbose_name = _(
+                    "Regular expression to match LDAP value for %s on %s against"
+                ) % (field.verbose_name, model._meta.label,)
                 required = False
                 default = ""
 
@@ -122,8 +114,7 @@ def update_dynamic_preferences():
 
 
 def apply_templates(value, patterns, templates, separator="|"):
-    """ Regex-replace patterns in value in order """
-
+    """Regex-replace patterns in value in order."""
     if isinstance(patterns, str):
         patterns = patterns.split(separator)
     if isinstance(templates, str):
@@ -142,8 +133,7 @@ def apply_templates(value, patterns, templates, separator="|"):
 
 @transaction.atomic
 def ldap_sync_user_on_login(sender, instance, created, **kwargs):
-    """ Synchronise Person meta-data and groups from ldap_user on User update. """
-
+    """Synchronise Person meta-data and groups from ldap_user on User update."""
     # Semaphore to guard recursive saves within this signal
     if getattr(instance, "_skip_signal", False):
         return
@@ -168,7 +158,9 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
             logger.error("More than one matching person for user %s" % user.username)
             return
         except (DataError, IntegrityError, ValueError) as e:
-            logger.error("Data error while synchronising user %s:\n%s" % (user.username, str(e)))
+            logger.error(
+                "Data error while synchronising user %s:\n%s" % (user.username, str(e))
+            )
             return
 
         if get_site_preferences()["ldap__enable_group_sync"]:
@@ -194,15 +186,17 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 
 @transaction.atomic
 def ldap_sync_from_user(user, dn, attrs):
-    """ Synchronise person information from a User object (with ldap_user) to Django """
-
+    """Synchronise person information from a User object (with ldap_user) to Django"""
     Person = apps.get_model("core", "Person")
 
     # Check if there is an existing person connected to the user.
     if Person.objects.filter(user__username=user.username).exists():
         person = user.person
         created = False
-        logger.info("Existing person %s already linked to user %s" % (str(person), user.username))
+        logger.info(
+            "Existing person %s already linked to user %s"
+            % (str(person), user.username)
+        )
     # FIXME ALso account for existing person with DN here
     else:
         # Build filter criteria depending on config
@@ -253,7 +247,9 @@ def ldap_sync_from_user(user, dn, attrs):
             value = from_ldap(value, person, field, dn, ldap_field)
 
             setattr(person, field.name, value)
-            logger.debug("Field %s set to %s for %s" % (field.name, str(value), str(person)))
+            logger.debug(
+                "Field %s set to %s for %s" % (field.name, str(value), str(person))
+            )
 
     person.save()
     return person
@@ -261,8 +257,7 @@ def ldap_sync_from_user(user, dn, attrs):
 
 @transaction.atomic
 def ldap_sync_from_groups(group_infos):
-    """ Synchronise group information from LDAP results to Django """
-
+    """Synchronise group information from LDAP results to Django."""
     Group = apps.get_model("core", "Group")
 
     # Resolve Group objects from LDAP group objects
@@ -270,10 +265,16 @@ def ldap_sync_from_groups(group_infos):
     for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
-        if get_site_preferences()["ldap__group_sync_field_short_name"] not in ldap_group[1]:
+        if (
+            get_site_preferences()["ldap__group_sync_field_short_name"]
+            not in ldap_group[1]
+        ):
             logger.error(
                 "LDAP group with DN %s does not have field %s"
-                % (ldap_group[0], get_site_preferences()["ldap__group_sync_field_short_name"])
+                % (
+                    ldap_group[0],
+                    get_site_preferences()["ldap__group_sync_field_short_name"],
+                )
             )
             continue
         if get_site_preferences()["ldap__group_sync_field_name"] not in ldap_group[1]:
@@ -285,7 +286,9 @@ def ldap_sync_from_groups(group_infos):
 
         # Apply regex replace from config
         short_name = apply_templates(
-            ldap_group[1][get_site_preferences()["ldap__group_sync_field_short_name"]][0],
+            ldap_group[1][get_site_preferences()["ldap__group_sync_field_short_name"]][
+                0
+            ],
             get_site_preferences()["ldap__group_sync_field_short_name_re"],
             get_site_preferences()["ldap__group_sync_field_short_name_replace"],
         )
@@ -303,7 +306,8 @@ def ldap_sync_from_groups(group_infos):
         try:
             with transaction.atomic():
                 group, created = Group.objects.update_or_create(
-                    ldap_dn=ldap_group[0].lower(), defaults={"short_name": short_name, "name": name}
+                    ldap_dn=ldap_group[0].lower(),
+                    defaults={"short_name": short_name, "name": name},
                 )
         except IntegrityError as e:
             logger.error(
@@ -316,7 +320,9 @@ def ldap_sync_from_groups(group_infos):
                 "%s LDAP group %s for Django group %s"
                 % (
                     ("Created" if created else "Updated"),
-                    ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0],
+                    ldap_group[1][
+                        get_site_preferences()["ldap__group_sync_field_name"]
+                    ][0],
                     name,
                 )
             )
@@ -328,8 +334,7 @@ def ldap_sync_from_groups(group_infos):
 
 @transaction.atomic
 def mass_ldap_import():
-    """ Utility code for mass import from ldap """
-
+    """Utility code for mass import from ldap."""
     from django_auth_ldap.backend import LDAPBackend, _LDAPUser  # noqa
 
     Person = apps.get_model("core", "Person")
@@ -344,12 +349,14 @@ def mass_ldap_import():
         group_objects = ldap_sync_from_groups(ldap_groups)
 
     # Guess LDAP username field from user filter
-    uid_field = re.search(r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr).group(
-        1
-    )
+    uid_field = re.search(
+        r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr
+    ).group(1)
 
     # Synchronise user data for all found users
-    ldap_users = backend.settings.USER_SEARCH.execute(connection, {"user": "*"}, escape=False)
+    ldap_users = backend.settings.USER_SEARCH.execute(
+        connection, {"user": "*"}, escape=False
+    )
     for dn, attrs in tqdm(ldap_users, desc="Sync. user infos", **TQDM_DEFAULTS):
         uid = attrs[uid_field][0]
 
@@ -372,11 +379,14 @@ def mass_ldap_import():
                 logger.warn("No matching person for user %s" % user.username)
                 continue
             except Person.MultipleObjectsReturned:
-                logger.error("More than one matching person for user %s" % user.username)
+                logger.error(
+                    "More than one matching person for user %s" % user.username
+                )
                 continue
             except (DataError, IntegrityError, ValueError) as e:
                 logger.error(
-                    "Data error while synchronising user %s:\n%s" % (user.username, str(e))
+                    "Data error while synchronising user %s:\n%s"
+                    % (user.username, str(e))
                 )
                 continue
             else:
@@ -394,7 +404,9 @@ def mass_ldap_import():
             **TQDM_DEFAULTS
         ):
             dn, attrs = ldap_group
-            ldap_members = [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
+            ldap_members = (
+                [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
+            )
 
             if member_attr.lower() == "memberUid":
                 members = Person.objects.filter(user__username__in=ldap_members)
@@ -402,7 +414,11 @@ def mass_ldap_import():
                 members = Person.objects.filter(ldap_dn__in=ldap_members)
 
             if get_site_preferences()["ldap__group_sync_owner_attr"]:
-                ldap_owners = [_.lower() for _ in attrs[owner_attr]] if owner_attr in attrs else []
+                ldap_owners = (
+                    [_.lower() for _ in attrs[owner_attr]]
+                    if owner_attr in attrs
+                    else []
+                )
                 if get_site_preferences()["ldap__group_sync_owner_attr_type"] == "uid":
                     owners = Person.objects.filter(user__username__in=ldap_owners)
                 elif get_site_preferences()["ldap__group_sync_owner_attr_type"] == "dn":
