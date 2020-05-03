@@ -6,7 +6,7 @@ from django.apps import apps
 from django.core.files import File
 from django.db import DataError, IntegrityError, transaction
 from django.db.models import fields
-from django.db.models.fields.files import FieldFile
+from django.db.models.fields.files import FileField
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
@@ -39,7 +39,7 @@ def ldap_field_to_filename(dn, fieldname):
 
 
 def from_ldap(value, instance, field, dn, ldap_field):
-    """Convert an LDAP value to the Python type of the target field
+    """Convert an LDAP value to the Python type of the target field.
 
     This conversion is prone to error because LDAP deliberately breaks
     standards to cope with ASN.1 limitations.
@@ -85,7 +85,8 @@ def update_dynamic_preferences():
                 section = section_ldap
                 name = setting_name + "_re"
                 verbose_name = _(
-                    f"Regular expression to match LDAP value for {field.verbose_name} on {model._meta.label} against"
+                    f("Regular expression to match LDAP value for"
+                    "{field.verbose_name} on {model._meta.label} against")
                 )
                 required = False
                 default = ""
@@ -172,7 +173,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 
 @transaction.atomic
 def ldap_sync_from_user(user, dn, attrs):
-    """Synchronise person information from a User object (with ldap_user) to Django"""
+    """Synchronise person information from a User object (with ldap_user) to Django."""
     Person = apps.get_model("core", "Person")
 
     # Check if there is an existing person connected to the user.
@@ -296,7 +297,7 @@ def ldap_sync_from_groups(group_infos):
 
 @transaction.atomic
 def mass_ldap_import():
-    """Utility code for mass import from ldap."""
+    """Add utility code for mass import from ldap."""
     from django_auth_ldap.backend import LDAPBackend, _LDAPUser  # noqa
 
     Person = apps.get_model("core", "Person")
