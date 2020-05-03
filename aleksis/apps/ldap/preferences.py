@@ -1,11 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from dynamic_preferences.preferences import Section
-from dynamic_preferences.types import (
-    BooleanPreference,
-    ChoicePreference,
-    StringPreference,
-)
+from dynamic_preferences.types import BooleanPreference, ChoicePreference, StringPreference
 
 from aleksis.core.registries import site_preferences_registry
 
