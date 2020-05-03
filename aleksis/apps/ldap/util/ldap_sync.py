@@ -85,10 +85,8 @@ def update_dynamic_preferences():
                 section = section_ldap
                 name = setting_name + "_re"
                 verbose_name = _(
-                    f(
-                        "Regular expression to match LDAP value for"
-                        "{field.verbose_name} on {model._meta.label} against"
-                    )
+                    f"Regular expression to match LDAP value for"
+                    f"{field.verbose_name} on {model._meta.label} against"
                 )
                 required = False
                 default = ""
@@ -365,11 +363,16 @@ def mass_ldap_import():
             **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
+
+            if dn not in group_dict:
+                logger.warning(f"Skip {dn} because there are no groups with this dn.")
+                continue
+
             group = group_dict[dn]
 
             ldap_members = [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
 
-            if member_attr.lower() == "memberUid":
+            if member_attr.lower() == "memberuid":
                 members = Person.objects.filter(user__username__in=ldap_members)
             else:
                 members = Person.objects.filter(ldap_dn__in=ldap_members)
