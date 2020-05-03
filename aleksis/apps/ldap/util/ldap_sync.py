@@ -76,7 +76,9 @@ def update_dynamic_preferences():
             class _GeneratedPreference(StringPreference):
                 section = section_ldap
                 name = setting_name
-                verbose_name = _(f"LDAP field for {field.verbose_name} on {model._meta.label}")
+                verbose_name = _(
+                    f"LDAP field for {field.verbose_name} on {model._meta.label}"
+                )
                 required = False
                 default = ""
 
@@ -84,7 +86,9 @@ def update_dynamic_preferences():
             class _GeneratedPreferenceRe(StringPreference):
                 section = section_ldap
                 name = setting_name + "_re"
-                verbose_name = _(f"Regular expression to match LDAP value for {field.verbose_name} on {model._meta.label} against")
+                verbose_name = _(
+                    f"Regular expression to match LDAP value for {field.verbose_name} on {model._meta.label} against"
+                )
                 required = False
                 default = ""
 
@@ -92,7 +96,9 @@ def update_dynamic_preferences():
             class _GeneratedPreferenceReplace(StringPreference):
                 section = section_ldap
                 name = setting_name + "_replace"
-                verbose_name = _(f"Replacement template to apply to {field.verbose_name} on {model._meta.label}")
+                verbose_name = _(
+                    f"Replacement template to apply to {field.verbose_name} on {model._meta.label}"
+                )
                 required = False
                 default = ""
 
@@ -240,14 +246,20 @@ def ldap_sync_from_groups(group_infos):
     for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
-        sync_field_short_name = get_site_preferences()["ldap__group_sync_field_short_name"]
+        sync_field_short_name = get_site_preferences()[
+            "ldap__group_sync_field_short_name"
+        ]
         if sync_field_short_name not in ldap_group[1]:
-            logger.error(f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_short_name}")
+            logger.error(
+                f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_short_name}"
+            )
             continue
 
         sync_field_name = get_site_preferences()["ldap__group_sync_field_name"]
         if sync_field_name not in ldap_group[1]:
-            logger.error(f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_name}")
+            logger.error(
+                f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_name}"
+            )
             continue
 
         # Apply regex replace from config
@@ -276,11 +288,15 @@ def ldap_sync_from_groups(group_infos):
                     defaults={"short_name": short_name, "name": name},
                 )
         except IntegrityError as e:
-            logger.error(f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}")
+            logger.error(
+                f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}"
+            )
             continue
         else:
-            status = ("Created" if created else "Updated")
-            value = ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0]
+            status = "Created" if created else "Updated"
+            value = ldap_group[1][
+                get_site_preferences()["ldap__group_sync_field_name"]
+            ][0]
             logger.info(f"{status} LDAP group {value} for Django group {name}")
 
         group_objects.append(group)
@@ -338,7 +354,9 @@ def mass_ldap_import():
                 logger.error(f"More than one matching person for user {user.username}")
                 continue
             except (DataError, IntegrityError, ValueError) as e:
-                logger.error(f"Data error while synchronising user {user.username}:\n{e}")
+                logger.error(
+                    f"Data error while synchronising user {user.username}:\n{e}"
+                )
                 continue
             else:
                 logger.info(f"Successfully imported user {uid}")
@@ -352,7 +370,7 @@ def mass_ldap_import():
             zip(group_objects, ldap_groups),
             desc="Sync. group members",
             total=len(group_objects),
-            **TQDM_DEFAULTS
+            **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
             ldap_members = (
