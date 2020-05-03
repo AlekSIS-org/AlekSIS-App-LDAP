@@ -359,10 +359,7 @@ def mass_ldap_import():
         owner_attr = get_site_preferences()["ldap__group_sync_owner_attr"]
 
         for ldap_group in tqdm(
-            ldap_groups,
-            desc="Sync. group members",
-            total=len(group_objects),
-            **TQDM_DEFAULTS,
+            ldap_groups, desc="Sync. group members", total=len(group_objects), **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
             group = group_dict[dn]
