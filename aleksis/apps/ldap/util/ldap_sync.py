@@ -304,6 +304,9 @@ def mass_ldap_import():
         ldap_groups = backend.settings.GROUP_SEARCH.execute(connection)
         group_objects = ldap_sync_from_groups(ldap_groups)
 
+        # Create lookup table as cache for later code
+        group_dict = {obj.ldap_dn: obj for obj in group_objects}
+
     # Guess LDAP username field from user filter
     uid_field = re.search(
         r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr
@@ -348,13 +351,15 @@ def mass_ldap_import():
         member_attr = getattr(backend.settings.GROUP_TYPE, "member_attr", "memberUid")
         owner_attr = get_site_preferences()["ldap__group_sync_owner_attr"]
 
-        for group, ldap_group in tqdm(
-            zip(group_objects, ldap_groups),
+        for ldap_group in tqdm(
+            ldap_groups,
             desc="Sync. group members",
             total=len(group_objects),
             **TQDM_DEFAULTS
         ):
             dn, attrs = ldap_group
+            group = group_dict[dn]
+
             ldap_members = (
                 [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
             )
