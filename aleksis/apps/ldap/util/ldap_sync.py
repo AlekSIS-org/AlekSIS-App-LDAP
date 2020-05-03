@@ -76,9 +76,7 @@ def update_dynamic_preferences():
             class _GeneratedPreference(StringPreference):
                 section = section_ldap
                 name = setting_name
-                verbose_name = _(
-                    f"LDAP field for {field.verbose_name} on {model._meta.label}"
-                )
+                verbose_name = _(f"LDAP field for {field.verbose_name} on {model._meta.label}")
                 required = False
                 default = ""
 
@@ -246,9 +244,7 @@ def ldap_sync_from_groups(group_infos):
     for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
-        sync_field_short_name = get_site_preferences()[
-            "ldap__group_sync_field_short_name"
-        ]
+        sync_field_short_name = get_site_preferences()["ldap__group_sync_field_short_name"]
         if sync_field_short_name not in ldap_group[1]:
             logger.error(
                 f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_short_name}"
@@ -264,9 +260,7 @@ def ldap_sync_from_groups(group_infos):
 
         # Apply regex replace from config
         short_name = apply_templates(
-            ldap_group[1][get_site_preferences()["ldap__group_sync_field_short_name"]][
-                0
-            ],
+            ldap_group[1][get_site_preferences()["ldap__group_sync_field_short_name"]][0],
             get_site_preferences()["ldap__group_sync_field_short_name_re"],
             get_site_preferences()["ldap__group_sync_field_short_name_replace"],
         )
@@ -288,15 +282,11 @@ def ldap_sync_from_groups(group_infos):
                     defaults={"short_name": short_name, "name": name},
                 )
         except IntegrityError as e:
-            logger.error(
-                f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}"
-            )
+            logger.error(f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}")
             continue
         else:
             status = "Created" if created else "Updated"
-            value = ldap_group[1][
-                get_site_preferences()["ldap__group_sync_field_name"]
-            ][0]
+            value = ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0]
             logger.info(f"{status} LDAP group {value} for Django group {name}")
 
         group_objects.append(group)
@@ -321,14 +311,12 @@ def mass_ldap_import():
         group_objects = ldap_sync_from_groups(ldap_groups)
 
     # Guess LDAP username field from user filter
-    uid_field = re.search(
-        r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr
-    ).group(1)
+    uid_field = re.search(r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr).group(
+        1
+    )
 
     # Synchronise user data for all found users
-    ldap_users = backend.settings.USER_SEARCH.execute(
-        connection, {"user": "*"}, escape=False
-    )
+    ldap_users = backend.settings.USER_SEARCH.execute(connection, {"user": "*"}, escape=False)
     for dn, attrs in tqdm(ldap_users, desc="Sync. user infos", **TQDM_DEFAULTS):
         uid = attrs[uid_field][0]
 
@@ -354,9 +342,7 @@ def mass_ldap_import():
                 logger.error(f"More than one matching person for user {user.username}")
                 continue
             except (DataError, IntegrityError, ValueError) as e:
-                logger.error(
-                    f"Data error while synchronising user {user.username}:\n{e}"
-                )
+                logger.error(f"Data error while synchronising user {user.username}:\n{e}")
                 continue
             else:
                 logger.info(f"Successfully imported user {uid}")
@@ -373,9 +359,7 @@ def mass_ldap_import():
             **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
-            ldap_members = (
-                [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
-            )
+            ldap_members = [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
 
             if member_attr.lower() == "memberUid":
                 members = Person.objects.filter(user__username__in=ldap_members)
@@ -383,11 +367,7 @@ def mass_ldap_import():
                 members = Person.objects.filter(ldap_dn__in=ldap_members)
 
             if get_site_preferences()["ldap__group_sync_owner_attr"]:
-                ldap_owners = (
-                    [_.lower() for _ in attrs[owner_attr]]
-                    if owner_attr in attrs
-                    else []
-                )
+                ldap_owners = [_.lower() for _ in attrs[owner_attr]] if owner_attr in attrs else []
                 if get_site_preferences()["ldap__group_sync_owner_attr_type"] == "uid":
                     owners = Person.objects.filter(user__username__in=ldap_owners)
                 elif get_site_preferences()["ldap__group_sync_owner_attr_type"] == "dn":
