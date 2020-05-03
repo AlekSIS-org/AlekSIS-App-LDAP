@@ -33,15 +33,6 @@ def setting_name_from_field(model, field):
     return f"additional_field_{part_1}_{field.name}"
 
 
-def syncable_fields(model):
-    """Collect all fields that can be synced on a model."""
-    return [
-        field
-        for field in model._meta.fields
-        if (field.editable and not field.auto_created and not field.is_relation)
-    ]
-
-
 def ldap_field_to_filename(dn, fieldname):
     """Generate a reproducible filename from a DN and a field name."""
     return f"{slugify(dn)}__{slugify(fieldname)}"
@@ -78,7 +69,7 @@ def update_dynamic_preferences():
     Person = apps.get_model("core", "Person")
     for model in (Person,):
         # Collect fields that are matchable
-        for field in syncable_fields(model):
+        for field in model.syncable_fields():
             setting_name = setting_name_from_field(model, field)
 
             @site_preferences_registry.register
@@ -216,7 +207,7 @@ def ldap_sync_from_user(user, dn, attrs):
         person.email = user.email
 
     # Synchronise additional fields if enabled
-    for field in syncable_fields(Person):
+    for field in Person.syncable_fields():
         setting_name = "ldap__" + setting_name_from_field(Person, field)
 
         # Try sync if constance setting for this field is non-empty
