@@ -29,7 +29,7 @@ TQDM_DEFAULTS = {
 
 def setting_name_from_field(model, field):
     """Generate a setting name from a model field."""
-    return "additional_field_%s_%s" % (model._meta.label_lower.replace(".", "__"), field.name)
+    return "additional_field_%s_%s" % (model._meta.label_lower.replace(".", "_"), field.name)
 
 
 def syncable_fields(model):
