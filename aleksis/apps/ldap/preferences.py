@@ -1,11 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from dynamic_preferences.preferences import Section
-from dynamic_preferences.types import (
-    BooleanPreference,
-    ChoicePreference,
-    StringPreference,
-)
+from dynamic_preferences.types import BooleanPreference, ChoicePreference, StringPreference
 
 from aleksis.core.registries import site_preferences_registry
 
@@ -43,11 +39,11 @@ class LDAPSyncCreateMissingPersons(BooleanPreference):
 class LDAPMatchingFields(ChoicePreference):
     section = ldap
     name = "matching_fields"
-    default = None
+    default = ""
     required = False
     verbose_name = _("LDAP sync matching fields")
     choices = [
-        (None, "-----"),
+        ("", "-----"),
         ("match-email", _("Match only on email")),
         ("match-name", _("Match only on name")),
         ("match-email-name", _("Match on email and name")),

@@ -6,7 +6,7 @@ from django.apps import apps
 from django.core.files import File
 from django.db import DataError, IntegrityError, transaction
 from django.db.models import fields
-from django.db.models.fields.files import FieldFile
+from django.db.models.fields.files import FileField
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
@@ -39,7 +39,7 @@ def ldap_field_to_filename(dn, fieldname):
 
 
 def from_ldap(value, instance, field, dn, ldap_field):
-    """Convert an LDAP value to the Python type of the target field
+    """Convert an LDAP value to the Python type of the target field.
 
     This conversion is prone to error because LDAP deliberately breaks
     standards to cope with ASN.1 limitations.
@@ -84,7 +84,12 @@ def update_dynamic_preferences():
             class _GeneratedPreferenceRe(StringPreference):
                 section = section_ldap
                 name = setting_name + "_re"
-                verbose_name = _(f"Regular expression to match LDAP value for {field.verbose_name} on {model._meta.label} against")
+                verbose_name = _(
+                    f(
+                        "Regular expression to match LDAP value for"
+                        "{field.verbose_name} on {model._meta.label} against"
+                    )
+                )
                 required = False
                 default = ""
 
@@ -92,7 +97,9 @@ def update_dynamic_preferences():
             class _GeneratedPreferenceReplace(StringPreference):
                 section = section_ldap
                 name = setting_name + "_replace"
-                verbose_name = _(f"Replacement template to apply to {field.verbose_name} on {model._meta.label}")
+                verbose_name = _(
+                    f"Replacement template to apply to {field.verbose_name} on {model._meta.label}"
+                )
                 required = False
                 default = ""
 
@@ -168,7 +175,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 
 @transaction.atomic
 def ldap_sync_from_user(user, dn, attrs):
-    """Synchronise person information from a User object (with ldap_user) to Django"""
+    """Synchronise person information from a User object (with ldap_user) to Django."""
     Person = apps.get_model("core", "Person")
 
     # Check if there is an existing person connected to the user.
@@ -242,19 +249,21 @@ def ldap_sync_from_groups(group_infos):
         # FIXME Throw exceptions and catch outside
         sync_field_short_name = get_site_preferences()["ldap__group_sync_field_short_name"]
         if sync_field_short_name not in ldap_group[1]:
-            logger.error(f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_short_name}")
+            logger.error(
+                f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_short_name}"
+            )
             continue
 
         sync_field_name = get_site_preferences()["ldap__group_sync_field_name"]
         if sync_field_name not in ldap_group[1]:
-            logger.error(f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_name}")
+            logger.error(
+                f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_name}"
+            )
             continue
 
         # Apply regex replace from config
         short_name = apply_templates(
-            ldap_group[1][get_site_preferences()["ldap__group_sync_field_short_name"]][
-                0
-            ],
+            ldap_group[1][get_site_preferences()["ldap__group_sync_field_short_name"]][0],
             get_site_preferences()["ldap__group_sync_field_short_name_re"],
             get_site_preferences()["ldap__group_sync_field_short_name_replace"],
         )
@@ -279,7 +288,7 @@ def ldap_sync_from_groups(group_infos):
             logger.error(f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}")
             continue
         else:
-            status = ("Created" if created else "Updated")
+            status = "Created" if created else "Updated"
             value = ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0]
             logger.info(f"{status} LDAP group {value} for Django group {name}")
 
@@ -290,7 +299,7 @@ def ldap_sync_from_groups(group_infos):
 
 @transaction.atomic
 def mass_ldap_import():
-    """Utility code for mass import from ldap."""
+    """Add utility code for mass import from ldap."""
     from django_auth_ldap.backend import LDAPBackend, _LDAPUser  # noqa
 
     Person = apps.get_model("core", "Person")
@@ -308,14 +317,12 @@ def mass_ldap_import():
         group_dict = {obj.ldap_dn: obj for obj in group_objects}
 
     # Guess LDAP username field from user filter
-    uid_field = re.search(
-        r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr
-    ).group(1)
+    uid_field = re.search(r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr).group(
+        1
+    )
 
     # Synchronise user data for all found users
-    ldap_users = backend.settings.USER_SEARCH.execute(
-        connection, {"user": "*"}, escape=False
-    )
+    ldap_users = backend.settings.USER_SEARCH.execute(connection, {"user": "*"}, escape=False)
     for dn, attrs in tqdm(ldap_users, desc="Sync. user infos", **TQDM_DEFAULTS):
         uid = attrs[uid_field][0]
 
@@ -355,14 +362,12 @@ def mass_ldap_import():
             ldap_groups,
             desc="Sync. group members",
             total=len(group_objects),
-            **TQDM_DEFAULTS
+            **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
             group = group_dict[dn]
 
-            ldap_members = (
-                [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
-            )
+            ldap_members = [_.lower() for _ in attrs[member_attr]] if member_attr in attrs else []
 
             if member_attr.lower() == "memberUid":
                 members = Person.objects.filter(user__username__in=ldap_members)
@@ -370,11 +375,7 @@ def mass_ldap_import():
                 members = Person.objects.filter(ldap_dn__in=ldap_members)
 
             if get_site_preferences()["ldap__group_sync_owner_attr"]:
-                ldap_owners = (
-                    [_.lower() for _ in attrs[owner_attr]]
-                    if owner_attr in attrs
-                    else []
-                )
+                ldap_owners = [_.lower() for _ in attrs[owner_attr]] if owner_attr in attrs else []
                 if get_site_preferences()["ldap__group_sync_owner_attr_type"] == "uid":
                     owners = Person.objects.filter(user__username__in=ldap_owners)
                 elif get_site_preferences()["ldap__group_sync_owner_attr_type"] == "dn":
