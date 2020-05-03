@@ -66,8 +66,8 @@ def from_ldap(value, instance, field, dn, ldap_field):
 
 def update_dynamic_preferences():
     """Auto-generate sync field settings from models."""
-    Person = apps.get_model("core", "Person")
-    for model in (Person,):
+    person = apps.get_model("core", "Person")
+    for model in (person,):
         # Collect fields that are matchable
         for field in model.syncable_fields():
             setting_name = setting_name_from_field(model, field)
@@ -128,7 +128,7 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
         return
     instance._skip_signal = True
 
-    Person = apps.get_model("core", "Person")
+    person = apps.get_model("core", "Person")
 
     if (
         get_site_preferences()["ldap__enable_sync"]
@@ -140,10 +140,10 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
                 person = ldap_sync_from_user(
                     instance, instance.ldap_user.dn, instance.ldap_user.attrs.data
                 )
-        except Person.DoesNotExist:
+        except person.DoesNotExist:
             logger.warn(f"No matching person for user {instance.username}")
             return
-        except Person.MultipleObjectsReturned:
+        except person.MultipleObjectsReturned:
             logger.error(f"More than one matching person for user {instance.username}")
             return
         except (DataError, IntegrityError, ValueError) as e:
@@ -174,13 +174,13 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 @transaction.atomic
 def ldap_sync_from_user(user, dn, attrs):
     """Synchronise person information from a User object (with ldap_user) to Django."""
-    Person = apps.get_model("core", "Person")
+    person = apps.get_model("core", "Person")
 
     # Check if there is an existing person connected to the user.
     if Person.objects.filter(user__username=user.username).exists():
-        person = user.person
+        person_ = user.person
         created = False
-        logger.info(f"Existing person {person} already linked to user {user.username}")
+        logger.info(f"Existing person {person_} already linked to user {user.username}")
     # FIXME ALso account for existing person with DN here
     else:
         # Build filter criteria depending on config
@@ -196,20 +196,20 @@ def ldap_sync_from_user(user, dn, attrs):
             defaults["email"] = user.email
 
         if get_site_preferences()["ldap__create_missing_persons"]:
-            person, created = Person.objects.get_or_create(**matches, defaults=defaults)
+            person_, created = Person.objects.get_or_create(**matches, defaults=defaults)
         else:
-            person = Person.objects.get(**matches)
+            person_ = Person.objects.get(**matches)
             created = False
 
-        person.user = user
+        person_.user = user
         status = "New" if created else "Existing"
-        logger.info(f"{status} person {person} linked to user {user.username}")
+        logger.info(f"{status} person {person_} linked to user {user.username}")
 
-    person.ldap_dn = dn.lower()
+    person_.ldap_dn = dn.lower()
     if not created:
-        person.first_name = user.first_name
-        person.last_name = user.last_name
-        person.email = user.email
+        person_.first_name = user.first_name
+        person_.last_name = user.last_name
+        person_.email = user.email
 
     # Synchronise additional fields if enabled
     for field in Person.syncable_fields():
@@ -226,19 +226,19 @@ def ldap_sync_from_user(user, dn, attrs):
             value = apply_templates(value, patterns, templates)
 
             # Opportunistically convert LDAP string value to Python object
-            value = from_ldap(value, person, field, dn, ldap_field)
+            value = from_ldap(value, person_, field, dn, ldap_field)
 
-            setattr(person, field.name, value)
-            logger.debug(f"Field {field.name} set to {value} for {person}")
+            setattr(person_, field.name, value)
+            logger.debug(f"Field {field.name} set to {value} for {person_}")
 
-    person.save()
-    return person
+    person_.save()
+    return person_
 
 
 @transaction.atomic
 def ldap_sync_from_groups(group_infos):
     """Synchronise group information from LDAP results to Django."""
-    Group = apps.get_model("core", "Group")
+    group = apps.get_model("core", "Group")
 
     # Resolve Group objects from LDAP group objects
     group_objects = []
@@ -272,13 +272,13 @@ def ldap_sync_from_groups(group_infos):
         )
 
         # Shorten names to fit into model fields
-        short_name = short_name[: Group._meta.get_field("short_name").max_length]
-        name = name[: Group._meta.get_field("name").max_length]
+        short_name = short_name[: group._meta.get_field("short_name").max_length]
+        name = name[: group._meta.get_field("name").max_length]
 
         # FIXME FInd a way to throw exceptions correctly but still continue import
         try:
             with transaction.atomic():
-                group, created = Group.objects.update_or_create(
+                group, created = group.objects.update_or_create(
                     ldap_dn=ldap_group[0].lower(),
                     defaults={"short_name": short_name, "name": name},
                 )
@@ -300,7 +300,7 @@ def mass_ldap_import():
     """Add utility code for mass import from ldap."""
     from django_auth_ldap.backend import LDAPBackend, _LDAPUser  # noqa
 
-    Person = apps.get_model("core", "Person")
+    person = apps.get_model("core", "Person")
 
     # Abuse pre-configured search object as general LDAP interface
     backend = LDAPBackend()
@@ -338,11 +338,11 @@ def mass_ldap_import():
         if created or get_site_preferences()["ldap__sync_on_update"]:
             try:
                 with transaction.atomic():
-                    person = ldap_sync_from_user(user, dn, attrs)
+                    person_ = ldap_sync_from_user(user, dn, attrs)
             except Person.DoesNotExist:
                 logger.warn(f"No matching person for user {user.username}")
                 continue
-            except Person.MultipleObjectsReturned:
+            except person_.MultipleObjectsReturned:
                 logger.error(f"More than one matching person for user {user.username}")
                 continue
             except (DataError, IntegrityError, ValueError) as e:

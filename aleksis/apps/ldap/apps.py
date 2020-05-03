@@ -25,6 +25,6 @@ class LDAPConfig(AppConfig):
 
         update_dynamic_preferences()
 
-        User = get_user_model()
+        user = get_user_model()
         if get_site_preferences()["ldap__person_sync_on_login"]:
-            post_save.connect(ldap_sync_user_on_login, sender=User)
+            post_save.connect(ldap_sync_user_on_login, sender=user)
