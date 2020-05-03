@@ -29,7 +29,7 @@ TQDM_DEFAULTS = {
 
 def setting_name_from_field(model, field):
     """Generate a setting name from a model field."""
-    return "additional_field_%s_%s" % (model._meta.label, field.name)
+    return f"additional_field_{model._meta.label}_{field.name}"
 
 
 def syncable_fields(model):
@@ -43,7 +43,7 @@ def syncable_fields(model):
 
 def ldap_field_to_filename(dn, fieldname):
     """Generate a reproducible filename from a DN and a field name."""
-    return "%s__%s" % (slugify(dn), slugify(fieldname))
+    return f"{slugify(dn)}__{slugify(fieldname)}"
 
 
 def from_ldap(value, instance, field, dn, ldap_field):
@@ -84,10 +84,7 @@ def update_dynamic_preferences():
             class _GeneratedPreference(StringPreference):
                 section = section_ldap
                 name = setting_name
-                verbose_name = _("LDAP field for %s on %s") % (
-                    field.verbose_name,
-                    model._meta.label,
-                )
+                verbose_name = _(f"LDAP field for {field.verbose_name} on {model._meta.label}")
                 required = False
                 default = ""
 
@@ -95,9 +92,7 @@ def update_dynamic_preferences():
             class _GeneratedPreferenceRe(StringPreference):
                 section = section_ldap
                 name = setting_name + "_re"
-                verbose_name = _(
-                    "Regular expression to match LDAP value for %s on %s against"
-                ) % (field.verbose_name, model._meta.label,)
+                verbose_name = _(f"Regular expression to match LDAP value for {field.verbose_name} on {model._meta.label} against")
                 required = False
                 default = ""
 
@@ -105,10 +100,7 @@ def update_dynamic_preferences():
             class _GeneratedPreferenceReplace(StringPreference):
                 section = section_ldap
                 name = setting_name + "_replace"
-                verbose_name = _("Replacement template to apply to %s on %s") % (
-                    field.verbose_name,
-                    model._meta.label,
-                )
+                verbose_name = _(f"Replacement template to apply to {field.verbose_name} on {model._meta.label}")
                 required = False
                 default = ""
 
@@ -152,15 +144,13 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
                     instance, instance.ldap_user.dn, instance.ldap_user.attrs.data
                 )
         except Person.DoesNotExist:
-            logger.warn("No matching person for user %s" % user.username)
+            logger.warn(f"No matching person for user {user.username}")
             return
         except Person.MultipleObjectsReturned:
-            logger.error("More than one matching person for user %s" % user.username)
+            logger.error(f"More than one matching person for user {user.username}")
             return
         except (DataError, IntegrityError, ValueError) as e:
-            logger.error(
-                "Data error while synchronising user %s:\n%s" % (user.username, str(e))
-            )
+            logger.error(f"Data error while synchronising user {user.username}:\n{e}")
             return
 
         if get_site_preferences()["ldap__enable_group_sync"]:
@@ -171,14 +161,14 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
 
             # Replace linked groups of logged-in user completely
             person.member_of.set(group_objects)
-            logger.info("Replaced group memberships of %s" % str(person))
+            logger.info(f"Replaced group memberships of {person}")
 
         try:
             person.save()
         except Exception as e:
             # Exceptions here are logged only because the synchronisation is optional
             # FIXME throw warning to user instead
-            logger.error("Could not save person %s:\n%s" % (str(person), str(e)))
+            logger.error(f"Could not save person {person}:\n{e}")
 
     # Remove semaphore
     del instance._skip_signal
@@ -193,10 +183,7 @@ def ldap_sync_from_user(user, dn, attrs):
     if Person.objects.filter(user__username=user.username).exists():
         person = user.person
         created = False
-        logger.info(
-            "Existing person %s already linked to user %s"
-            % (str(person), user.username)
-        )
+        logger.info(f"Existing person {person} already linked to user {user.username}")
     # FIXME ALso account for existing person with DN here
     else:
         # Build filter criteria depending on config
@@ -218,10 +205,8 @@ def ldap_sync_from_user(user, dn, attrs):
             created = False
 
         person.user = user
-        logger.info(
-            "%s person %s linked to user %s"
-            % ("New" if created else "Existing", str(person), user.username)
-        )
+        status = "New" if created else "Existing"
+        logger.info(f"{status} person {person} linked to user {user.username}")
 
     person.ldap_dn = dn.lower()
     if not created:
@@ -247,9 +232,7 @@ def ldap_sync_from_user(user, dn, attrs):
             value = from_ldap(value, person, field, dn, ldap_field)
 
             setattr(person, field.name, value)
-            logger.debug(
-                "Field %s set to %s for %s" % (field.name, str(value), str(person))
-            )
+            logger.debug(f"Field {field.name} set to {value} for {person}")
 
     person.save()
     return person
@@ -265,23 +248,14 @@ def ldap_sync_from_groups(group_infos):
     for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
-        if (
-            get_site_preferences()["ldap__group_sync_field_short_name"]
-            not in ldap_group[1]
-        ):
-            logger.error(
-                "LDAP group with DN %s does not have field %s"
-                % (
-                    ldap_group[0],
-                    get_site_preferences()["ldap__group_sync_field_short_name"],
-                )
-            )
+        sync_field_short_name = get_site_preferences()["ldap__group_sync_field_short_name"]
+        if sync_field_short_name not in ldap_group[1]:
+            logger.error(f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_short_name}")
             continue
-        if get_site_preferences()["ldap__group_sync_field_name"] not in ldap_group[1]:
-            logger.error(
-                "LDAP group with DN %s does not have field %s"
-                % (ldap_group[0], get_site_preferences()["ldap__group_sync_field_name"])
-            )
+
+        sync_field_name = get_site_preferences()["ldap__group_sync_field_name"]
+        if sync_field_name not in ldap_group[1]:
+            logger.error(f"LDAP group with DN {ldap_group[0]} does not have field {sync_field_name}")
             continue
 
         # Apply regex replace from config
@@ -310,22 +284,12 @@ def ldap_sync_from_groups(group_infos):
                     defaults={"short_name": short_name, "name": name},
                 )
         except IntegrityError as e:
-            logger.error(
-                "Integrity error while trying to import LDAP group %s:\n%s"
-                % (ldap_group[0], str(e))
-            )
+            logger.error(f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}")
             continue
         else:
-            logger.info(
-                "%s LDAP group %s for Django group %s"
-                % (
-                    ("Created" if created else "Updated"),
-                    ldap_group[1][
-                        get_site_preferences()["ldap__group_sync_field_name"]
-                    ][0],
-                    name,
-                )
-            )
+            status = ("Created" if created else "Updated")
+            value = ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0]
+            logger.info(f"{status} LDAP group {value} for Django group {name}")
 
         group_objects.append(group)
 
@@ -376,21 +340,16 @@ def mass_ldap_import():
                 with transaction.atomic():
                     person = ldap_sync_from_user(user, dn, attrs)
             except Person.DoesNotExist:
-                logger.warn("No matching person for user %s" % user.username)
+                logger.warn(f"No matching person for user {user.username}")
                 continue
             except Person.MultipleObjectsReturned:
-                logger.error(
-                    "More than one matching person for user %s" % user.username
-                )
+                logger.error(f"More than one matching person for user {user.username}")
                 continue
             except (DataError, IntegrityError, ValueError) as e:
-                logger.error(
-                    "Data error while synchronising user %s:\n%s"
-                    % (user.username, str(e))
-                )
+                logger.error(f"Data error while synchronising user {user.username}:\n{e}")
                 continue
             else:
-                logger.info("Successfully imported user %s" % uid)
+                logger.info(f"Successfully imported user {uid}")
 
     # Synchronise group memberships now
     if get_site_preferences()["ldap__enable_group_sync"]:
@@ -428,6 +387,6 @@ def mass_ldap_import():
             if get_site_preferences()["ldap__group_sync_owner_attr"]:
                 group.owners.set(owners)
             group.save()
-            logger.info("Set group members of group %s" % str(group))
+            logger.info(f"Set group members of group {group}")
 
     logger.info("Commiting transaction; this can take some time.")
