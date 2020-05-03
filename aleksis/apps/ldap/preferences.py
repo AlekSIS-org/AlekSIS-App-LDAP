@@ -155,6 +155,6 @@ class LDAPGroupSyncOwnerAttrType(ChoicePreference):
 class LDAPPersonSyncOnLogin(BooleanPreference):
     section = ldap
     name = "person_sync_on_login"
-    default = "true"
+    default = True
     required = False
     verbose_name = _("Sync LDAP user with person on login")
