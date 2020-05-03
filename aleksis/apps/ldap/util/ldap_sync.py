@@ -86,7 +86,7 @@ def update_dynamic_preferences():
                 name = setting_name + "_re"
                 verbose_name = _(
                     f"Regular expression to match LDAP value for"
-                    f"{field.verbose_name} on {model._meta.label} against"
+                    "{field.verbose_name} on {model._meta.label} against"
                 )
                 required = False
                 default = ""
@@ -141,13 +141,13 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
                     instance, instance.ldap_user.dn, instance.ldap_user.attrs.data
                 )
         except Person.DoesNotExist:
-            logger.warn(f"No matching person for user {user.username}")
+            logger.warn(f"No matching person for user {instance.username}")
             return
         except Person.MultipleObjectsReturned:
-            logger.error(f"More than one matching person for user {user.username}")
+            logger.error(f"More than one matching person for user {instance.username}")
             return
         except (DataError, IntegrityError, ValueError) as e:
-            logger.error(f"Data error while synchronising user {user.username}:\n{e}")
+            logger.error(f"Data error while synchronising user {instance.username}:\n{e}")
             return
 
         if get_site_preferences()["ldap__enable_group_sync"]:
@@ -357,10 +357,7 @@ def mass_ldap_import():
         owner_attr = get_site_preferences()["ldap__group_sync_owner_attr"]
 
         for ldap_group in tqdm(
-            ldap_groups,
-            desc="Sync. group members",
-            total=len(group_objects),
-            **TQDM_DEFAULTS,
+            ldap_groups, desc="Sync. group members", total=len(group_objects), **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
 
