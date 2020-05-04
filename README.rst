@@ -9,7 +9,10 @@ This is an application for use with the `AlekSIS`_ platform.
 Features
 --------
 
-The author of this app did not describe it yet.
+* Configurable sync strategies
+* Management commands for ldap import
+* Mass import of users and groups
+* Sync LDAP users and groups on login
 
 Licence
 -------
