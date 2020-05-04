@@ -1,13 +1,16 @@
 Changelog
 =========
 
-`1.0`_
+`2.0a2`_
 ------
 
 New features
 ~~~~~~~~~~~~
 
-* Initial release
+* Configurable sync strategies
+* Management commands for ldap import
+* Mass import of users and groups
+* Sync LDAP users and groups on login
 
 Bugfixes
 ~~~~~~~~
@@ -19,4 +22,4 @@ Minor changes
 
 * None
 
-_`1.0`: https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP/AlekSIS-App-LDAP/-/tags/1.0
+_`2.0a2`: https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP/AlekSIS-App-LDAP/-/tags/2.0a2
