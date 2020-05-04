@@ -123,6 +123,10 @@ def apply_templates(value, patterns, templates, separator="|"):
 @transaction.atomic
 def ldap_sync_user_on_login(sender, instance, created, **kwargs):
     """Synchronise Person meta-data and groups from ldap_user on User update."""
+    # Check if sync on login is activated
+    if not get_site_preferences()["ldap__person_sync_on_login"]:
+        return
+
     # Semaphore to guard recursive saves within this signal
     if getattr(instance, "_skip_signal", False):
         return
