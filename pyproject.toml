@@ -28,7 +28,7 @@ classifiers = [
 python = "^3.7"
 django-ldapdb = "^1.4.0"
 tqdm = "^4.44.1"
-AlekSIS = { path = "../../.." }
+AlekSIS = "^2.0a2"
 
 [build-system]
 requires = ["poetry>=1.0"]
