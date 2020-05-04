@@ -1,21 +1,27 @@
 [tool.poetry]
 name = "AlekSIS-App-LDAP"
-version = "1.0"
+version = "2.0a2"
 packages = [
     { include = "aleksis" }
 ]
 readme = "README.rst"
+include = ["CHANGELOG.rst", "LICENCE.rst"]
 
 description = "AlekSIS (School Information System) — App LDAP (General LDAP import/export)"
-authors = ["Tom Teichler <tom.teichler@teckids.org>"]
-license = "EUPL-1.2"
-homepage = "https://aleksis.edugit.io/"
-repository = "https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP/AlekSIS-App-LDAP"
-documentation = "https://aleksis.edugit.io/AlekSIS/docs/html/"
+authors = ["Tom Teichler <tom.teichler@teckids.org>", "Dominik George <dominik.george@teckids.org>"]
+maintainers = ["Jonathan Weth <wethjo@katharineum.de>", "Dominik George <dominik.george@teckids.org>"]
+license = "EUPL-1.2-or-later"
+homepage = "https://aleksis.org/"
+repository = "https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP"
+documentation = "https://aleksis.org/AlekSIS/docs/html/"
+keywords = ["SIS", "education", "school", "ldap", "users"]
 classifiers = [
+    "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
+    "Framework :: Django :: 3.0",
     "Intended Audience :: Education",
-    "Topic :: Education"
+    "Topic :: Education",
+    "Typing :: Typed",
 ]
 
 [tool.poetry.dependencies]
