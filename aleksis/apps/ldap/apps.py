@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 
 from aleksis.core.util.apps import AppConfig
-from aleksis.core.util.core_helpers import get_site_preferences
 
 from .util.ldap_sync import ldap_sync_user_on_login, update_dynamic_preferences
 
