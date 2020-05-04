@@ -8,10 +8,10 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-04 15:45+0200\n"
-"PO-Revision-Date: 2020-04-27 13:05+0000\n"
-"Last-Translator: Frank Poetzsch-Heffter <p-h@katharineum.de>\n"
-"Language-Team: German <https://translate.edugit.org/projects/aleksis/aleksis-"
-"app-ldap/de/>\n"
+"PO-Revision-Date: 2020-05-04 14:16+0000\n"
+"Last-Translator: Jonathan Weth <teckids@jonathanweth.de>\n"
+"Language-Team: German <https://translate.edugit.org/projects/aleksis/"
+"aleksis-app-ldap/de/>\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,16 +24,12 @@ msgid "LDAP Distinguished Name"
 msgstr "LDAP Distinguished Name (DN)"
 
 #: preferences.py:17
-#, fuzzy
-#| msgid "Enable ldap sync"
 msgid "Enable LDAP sync"
 msgstr "LDAP-Synchronisation aktivieren"
 
 #: preferences.py:26
-#, fuzzy
-#| msgid "Also sync if user updates"
 msgid "Also sync LDAP if user updates"
-msgstr "Auch synchronisieren, wenn der Nutzer aktualisiert wird"
+msgstr "LDAP auch synchronisieren, wenn der Nutzer geändert wurde"
 
 #: preferences.py:35
 msgid "Create missing persons for LDAP users"
@@ -41,7 +37,7 @@ msgstr "Fehlende Personen für LDAP-Nutzer erstellen"
 
 #: preferences.py:44 preferences.py:143
 msgid "LDAP sync matching fields"
-msgstr ""
+msgstr "LDAP-Synchronisation für passende Felder durchführen"
 
 #: preferences.py:47
 msgid "Match only on email"
@@ -64,10 +60,6 @@ msgid "Field for short name of group"
 msgstr "Feld für den Kurznamen der Gruppe"
 
 #: preferences.py:78
-#, fuzzy
-#| msgid ""
-#| "Regular expression to match LDAP value for group short name against, e.g. "
-#| "class_(?P<class>.*); separate multiple patterns by |"
 msgid ""
 "Regular expression to match LDAP value for group short name against,e.g. "
 "class_(?P<class>.*); separate multiple patterns by |"
@@ -76,10 +68,6 @@ msgstr ""
 "Gruppe, z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
 
 #: preferences.py:90
-#, fuzzy
-#| msgid ""
-#| "Replacement template to apply to group short name, e.g. \\g<class>; "
-#| "separate multiple templates by |"
 msgid ""
 "Replacement template to apply to group short name,e.g. \\g<class>; separate "
 "multiple templates by |"
@@ -92,22 +80,14 @@ msgid "Field for name of group"
 msgstr "Feld für Gruppennamen"
 
 #: preferences.py:111
-#, fuzzy
-#| msgid ""
-#| "Regular expression to match LDAP value for group name against, e.g. "
-#| "class_(?P<class>.*); separate multiple patterns by |"
 msgid ""
 "Regular expression to match LDAP value for group name against,e.g. class_(?"
 "P<class>.*); separate multiple patterns by |"
 msgstr ""
-" Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Gruppennamen mit z."
-"B. class_(?P<class>.*); trenne mehrere Muster durch |"
+"Regulärer Ausdruck zum Abgleich des LDAP-Wertes für den Gruppennamen mit "
+"z.B. class_(?P<class>.*); trenne mehrere Muster durch |"
 
 #: preferences.py:123
-#, fuzzy
-#| msgid ""
-#| "Replacement template to apply to group name, e.g. \\g<class>; separate "
-#| "multiple templates by |"
 msgid ""
 "Replacement template to apply to group name,e.g. \\g<class>; separate "
 "multiple templates by |"
@@ -129,27 +109,28 @@ msgstr "UID"
 
 #: preferences.py:156
 msgid "Sync LDAP user with person on login"
-msgstr ""
+msgstr "LDAP-Nutzer bei der Anmeldung synchronisieren"
 
 #: util/ldap_sync.py:79
 #, python-brace-format
 msgid "LDAP field for {field.verbose_name} on {model._meta.label}"
-msgstr ""
+msgstr "LDAP-Feld für {field.verbose_name} in {model._meta.label}"
 
 #: util/ldap_sync.py:88
-#, fuzzy, python-brace-format
-#| msgid "Regular expression to match LDAP value for %s against"
+#, python-brace-format
 msgid ""
 "Regular expression to match LDAP value for{field.verbose_name} on {model."
 "_meta.label} against"
-msgstr "Regulärer Ausdruck zum Abgleich des LDAP-Wertes für %s gegen"
+msgstr ""
+"Regulärer Ausdruck zum Abgleich des LDAP-Wertes für {field.verbose_name} in "
+"{model._meta.label}"
 
 #: util/ldap_sync.py:99
-#, fuzzy, python-brace-format
-#| msgid "Replacement template to apply to %s"
+#, python-brace-format
 msgid ""
 "Replacement template to apply to {field.verbose_name} on {model._meta.label}"
-msgstr "Ersatzvorlage zur Anwendung auf %s"
+msgstr ""
+"Ersatzvorlage zur Anwendung auf {field.verbose_name} in {model._meta.label}"
 
 #~ msgid "Type of data in the ldap_field. Either DN or UID"
 #~ msgstr "Art der Daten im ldap_field. Entweder DN oder UID"
