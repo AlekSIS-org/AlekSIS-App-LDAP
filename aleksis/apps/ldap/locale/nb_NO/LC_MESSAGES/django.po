@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-28 13:31+0000\n"
+"POT-Creation-Date: 2020-05-04 15:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,84 +21,100 @@ msgstr ""
 msgid "LDAP Distinguished Name"
 msgstr ""
 
-#: settings.py:11
-msgid "Match only on email"
+#: preferences.py:17
+msgid "Enable LDAP sync"
 msgstr ""
 
-#: settings.py:12
-msgid "Match only on name"
+#: preferences.py:26
+msgid "Also sync LDAP if user updates"
 msgstr ""
 
-#: settings.py:13
-msgid "Match on email and name"
-msgstr ""
-
-#: settings.py:22
-msgid "Distinguished Name"
-msgstr ""
-
-#: settings.py:23
-msgid "UID"
-msgstr ""
-
-#: settings.py:30
-msgid "Enable ldap sync"
-msgstr ""
-
-#: settings.py:31
-msgid "Also sync if user updates"
-msgstr ""
-
-#: settings.py:32
+#: preferences.py:35
 msgid "Create missing persons for LDAP users"
 msgstr ""
 
-#: settings.py:35
+#: preferences.py:44 preferences.py:143
 msgid "LDAP sync matching fields"
 msgstr ""
 
-#: settings.py:38
+#: preferences.py:47
+msgid "Match only on email"
+msgstr ""
+
+#: preferences.py:48
+msgid "Match only on name"
+msgstr ""
+
+#: preferences.py:49
+msgid "Match on email and name"
+msgstr ""
+
+#: preferences.py:59
 msgid "Enable ldap group sync"
 msgstr ""
 
-#: settings.py:39
+#: preferences.py:68
 msgid "Field for short name of group"
 msgstr ""
 
-#: settings.py:40
-msgid "Regular expression to match LDAP value for group short name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+#: preferences.py:78
+msgid ""
+"Regular expression to match LDAP value for group short name against,e.g. "
+"class_(?P<class>.*); separate multiple patterns by |"
 msgstr ""
 
-#: settings.py:41
-msgid "Replacement template to apply to group short name, e.g. \\g<class>; separate multiple templates by |"
+#: preferences.py:90
+msgid ""
+"Replacement template to apply to group short name,e.g. \\g<class>; separate "
+"multiple templates by |"
 msgstr ""
 
-#: settings.py:42
+#: preferences.py:101
 msgid "Field for name of group"
 msgstr ""
 
-#: settings.py:43
-msgid "Regular expression to match LDAP value for group name against, e.g. class_(?P<class>.*); separate multiple patterns by |"
+#: preferences.py:111
+msgid ""
+"Regular expression to match LDAP value for group name against,e.g. class_(?"
+"P<class>.*); separate multiple patterns by |"
 msgstr ""
 
-#: settings.py:44
-msgid "Replacement template to apply to group name, e.g. \\g<class>; separate multiple templates by |"
+#: preferences.py:123
+msgid ""
+"Replacement template to apply to group name,e.g. \\g<class>; separate "
+"multiple templates by |"
 msgstr ""
 
-#: settings.py:45
+#: preferences.py:134
 msgid "LDAP field with dn of group owner"
 msgstr ""
 
-#: settings.py:46
-msgid "Type of data in the ldap_field. Either DN or UID"
+#: preferences.py:145
+msgid "Distinguished Name"
 msgstr ""
 
-#: util/ldap_sync.py:85
-#, python-format
-msgid "Regular expression to match LDAP value for %s against"
+#: preferences.py:146
+msgid "UID"
 msgstr ""
 
-#: util/ldap_sync.py:86
-#, python-format
-msgid "Replacement template to apply to %s"
+#: preferences.py:156
+msgid "Sync LDAP user with person on login"
+msgstr ""
+
+#: util/ldap_sync.py:79
+#, python-brace-format
+msgid "LDAP field for {field.verbose_name} on {model._meta.label}"
+msgstr ""
+
+#: util/ldap_sync.py:88
+#, python-brace-format
+msgid ""
+"Regular expression to match LDAP value for{field.verbose_name} on {model."
+"_meta.label} against"
+msgstr ""
+
+#: util/ldap_sync.py:99
+#, python-brace-format
+msgid ""
+"Replacement template to apply to {field.verbose_name} on {model._meta.label}"
 msgstr ""
