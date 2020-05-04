@@ -26,5 +26,5 @@ full licence text or on the `European Union Public Licence`_ website
 https://joinup.ec.europa.eu/collection/eupl/guidelines-users-and-developers
 (including all other official language versions).
 
-.. _AlekSIS: https://edugit.org/AlekSIS/AlekSIS
+.. _AlekSIS: https://aleksis.org/
 .. _European Union Public Licence: https://eupl.eu/
