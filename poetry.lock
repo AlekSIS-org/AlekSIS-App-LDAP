@@ -5,7 +5,7 @@ develop = true
 name = "aleksis"
 optional = false
 python-versions = "^3.7"
-version = "2.0a1"
+version = "2.0a2"
 
 [package.dependencies]
 Django = "^3.0"
@@ -16,12 +16,12 @@ django-any-js = "^1.0"
 django-bleach = "^0.6.1"
 django-cache-memoize = "^0.1.6"
 django-ckeditor = "^5.8.0"
-django-colorfield = "^0.2.1"
+django-colorfield = "^0.3.0"
 django-dbbackup = "^3.3.0"
 django-debug-toolbar = "^2.0"
-django-dynamic-preferences = "rev develop"
+django-dynamic-preferences = "rev fixed"
 django-easy-audit = "^1.2rc1"
-django-favicon-plus-reloaded = "^1.0.1"
+django-favicon-plus-reloaded = "^1.0.2"
 django-filter = "^2.2.0"
 django-guardian = "^2.2.0"
 django-hattori = "^0.2"
@@ -35,7 +35,7 @@ django-maintenance-mode = "^0.14.0"
 django-material = "^1.6.0"
 django-menu-generator = "^1.0.4"
 django-middleware-global-request = "^0.1.2"
-django-otp = "0.7.5"
+django-otp = "0.9.0"
 django-polymorphic = "^2.1.2"
 django-pwa = "^1.0.8"
 django-reversion = "^3.0.7"
@@ -48,7 +48,7 @@ django_select2 = "^7.1"
 django_widget_tweaks = "^1.4.5"
 easy-thumbnails = "^2.6"
 html2text = "^2020.0.0"
-libsass = "^0.19.2"
+libsass = "^0.20.0"
 license-expression = "^1.2"
 psycopg2 = "^2.8"
 python-memcached = "^1.59"
@@ -69,7 +69,7 @@ extras = ["yaml", "toml", "ini"]
 version = "^2.0"
 
 [package.extras]
-celery = ["Celery (^4.4.0)", "django-celery-results (^1.1.2)", "django-celery-beat (^2.0.0)", "django-celery-email (^3.0.0)", "celery-haystack (^0.3.1)"]
+celery = ["Celery (^4.4.0)", "django-celery-results (^1.1.2)", "django-celery-beat (^2.0.0)", "django-celery-email (^3.0.0)", "celery-haystack (^0.7.0)"]
 ldap = ["django-auth-ldap (^2.0)"]
 
 [package.source]
@@ -207,7 +207,7 @@ description = "A high-level Python Web framework that encourages rapid developme
 name = "django"
 optional = false
 python-versions = ">=3.6"
-version = "3.0.5"
+version = "3.0.6"
 
 [package.dependencies]
 asgiref = ">=3.2,<4.0"
@@ -291,7 +291,7 @@ description = "simple color field for your models with a nice color-picker in th
 name = "django-colorfield"
 optional = false
 python-versions = "*"
-version = "0.2.2"
+version = "0.3.0"
 
 [[package]]
 category = "main"
@@ -332,9 +332,9 @@ persisting_theory = ">=0.2.1"
 six = "*"
 
 [package.source]
-reference = "3cb2637e99455260e1988fb969bdce16ba7a9801"
+reference = "7bee176d6a832c200d255bcd1e9d12c85cb1d4f8"
 type = "git"
-url = "https://github.com/EliotBerriot/django-dynamic-preferences"
+url = "https://github.com/hansegucker/django-dynamic-preferences"
 [[package]]
 category = "main"
 description = "Yet another Django audit log app, hopefully the simplest one."
@@ -352,7 +352,7 @@ description = "simple Django app which allows you to upload a image and it rende
 name = "django-favicon-plus-reloaded"
 optional = false
 python-versions = "*"
-version = "1.0.1"
+version = "1.0.3"
 
 [package.dependencies]
 django = "*"
@@ -531,11 +531,10 @@ description = "A pluggable framework for adding two-factor authentication to Dja
 name = "django-otp"
 optional = false
 python-versions = "*"
-version = "0.7.5"
+version = "0.9.0"
 
 [package.dependencies]
 django = ">=1.11"
-six = ">=1.10.0"
 
 [package.extras]
 qrcode = ["qrcode"]
@@ -806,7 +805,7 @@ description = "Sass for Python: A straightforward binding of libsass for Python.
 name = "libsass"
 optional = false
 python-versions = "*"
-version = "0.19.4"
+version = "0.20.0"
 
 [package.dependencies]
 six = "*"
@@ -1194,8 +1193,8 @@ configobj = [
     {file = "configobj-5.0.6.tar.gz", hash = "sha256:a2f5650770e1c87fb335af19a9b7eb73fc05ccf22144eb68db7d00cd2bcb0902"},
 ]
 django = [
-    {file = "Django-3.0.5-py3-none-any.whl", hash = "sha256:642d8eceab321ca743ae71e0f985ff8fdca59f07aab3a9fb362c617d23e33a76"},
-    {file = "Django-3.0.5.tar.gz", hash = "sha256:d4666c2edefa38c5ede0ec1655424c56dc47ceb04b6d8d62a7eac09db89545c1"},
+    {file = "Django-3.0.6-py3-none-any.whl", hash = "sha256:051ba55d42daa3eeda3944a8e4df2bc96d4c62f94316dea217248a22563c3621"},
+    {file = "Django-3.0.6.tar.gz", hash = "sha256:9aaa6a09678e1b8f0d98a948c56482eac3e3dd2ddbfb8de70a868135ef3b5e01"},
 ]
 django-any-js = [
     {file = "django-any-js-1.0.3.post0.tar.gz", hash = "sha256:1da88b44b861b0f54f6b8ea0eb4c7c4fa1a5772e9a4320532cd4e0871a4e23f7"},
@@ -1221,8 +1220,8 @@ django-ckeditor = [
     {file = "django_ckeditor-5.9.0-py2.py3-none-any.whl", hash = "sha256:71c3c7bb46b0cbfb9712ef64af0d2a406eab233f44ecd7c42c24bdfa39ae3bde"},
 ]
 django-colorfield = [
-    {file = "django-colorfield-0.2.2.tar.gz", hash = "sha256:49cfce71365de88130e65ced8f2c5c4826b31e9ab0c5f0e721ff13a830b5be76"},
-    {file = "django_colorfield-0.2.2-py2-none-any.whl", hash = "sha256:ecb8af68f35028e35f973ddb687c2dcae86d028c6da1b72580c0d3fae915d3b7"},
+    {file = "django-colorfield-0.3.0.tar.gz", hash = "sha256:808fd1783be0331dc15f0d4e98d18e3b31257b4837ac89594b94f87170d6c6ce"},
+    {file = "django_colorfield-0.3.0-py2-none-any.whl", hash = "sha256:7bec0c7a8b3b170bf232f78ed23d2545ddc9c43cb2f45704ccdd57b948b29d8c"},
 ]
 django-dbbackup = [
     {file = "django-dbbackup-3.3.0.tar.gz", hash = "sha256:bb109735cae98b64ad084e5b461b7aca2d7b39992f10c9ed9435e3ebb6fb76c8"},
@@ -1237,8 +1236,8 @@ django-easy-audit = [
     {file = "django_easy_audit-1.2.2b4-py3-none-any.whl", hash = "sha256:49ef3beea7bf439b349daa66d5e3d7624a7c9005d3bfd51f54d15dd5dcfaa202"},
 ]
 django-favicon-plus-reloaded = [
-    {file = "django-favicon-plus-reloaded-1.0.1.tar.gz", hash = "sha256:ee48b9a86ee20e5285216dc76c69cc6e8bcdcb1ea83c2585785dff7a4eebfc7b"},
-    {file = "django_favicon_plus_reloaded-1.0.1-py3-none-any.whl", hash = "sha256:d796bb994aa648a1d9c8276674a4de4e6af3ef2583dcd4d45495b4d3df85e283"},
+    {file = "django-favicon-plus-reloaded-1.0.3.tar.gz", hash = "sha256:fdb198bb24437bee74c8e6ba659d29dff7a5b86348779de31ddbe99bdc5eb3f8"},
+    {file = "django_favicon_plus_reloaded-1.0.3-py3-none-any.whl", hash = "sha256:f56f7b5e146ebbf98456f567b442c1d7b5d5ff50ee34c7ea8d6f8584ffdb8556"},
 ]
 django-filter = [
     {file = "django-filter-2.2.0.tar.gz", hash = "sha256:c3deb57f0dd7ff94d7dce52a047516822013e2b441bed472b722a317658cfd14"},
@@ -1300,8 +1299,8 @@ django-middleware-global-request = [
     {file = "django-middleware-global-request-0.1.2.tar.gz", hash = "sha256:f6490759bc9f7dbde4001709554e29ca715daf847f2222914b4e47117dca9313"},
 ]
 django-otp = [
-    {file = "django-otp-0.7.5.tar.gz", hash = "sha256:1f16c2b93fe484706ff16ac6f5e64ecc73dd240318c333e0560384ba548d3837"},
-    {file = "django_otp-0.7.5-py2.py3-none-any.whl", hash = "sha256:cd4975539be478417033561e9832a1a69a583189f680e92a649f412c661f90aa"},
+    {file = "django-otp-0.9.0.tar.gz", hash = "sha256:f5faa95a3e85391e70e433205509fa070ed25646f15fcafd2cd2fbd987c33262"},
+    {file = "django_otp-0.9.0-py3-none-any.whl", hash = "sha256:334e2a0ece7e5d9de3263e17bd3b6aee2809d1f8d70555408d5bf8f0c33b13fb"},
 ]
 django-otp-yubikey = [
     {file = "django-otp-yubikey-0.5.2.tar.gz", hash = "sha256:f0b1881562fb42ee9f12c28d284cbdb90d1f0383f2d53a595373b080a19bc261"},
@@ -1374,24 +1373,17 @@ idna = [
     {file = "idna-2.9.tar.gz", hash = "sha256:7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb"},
 ]
 libsass = [
-    {file = "libsass-0.19.4-cp27-cp27m-macosx_10_14_intel.whl", hash = "sha256:74acd9adf506142699dfa292f0e569fdccbd9e7cf619e8226f7117de73566e32"},
-    {file = "libsass-0.19.4-cp27-cp27m-win32.whl", hash = "sha256:50778d4be269a021ba2bf42b5b8f6ff3704ab96a82175a052680bddf3ba7cc9f"},
-    {file = "libsass-0.19.4-cp27-cp27m-win_amd64.whl", hash = "sha256:4dcfd561fb100250b89496e1362b96f2cc804f689a59731eb0f94f9a9e144f4a"},
-    {file = "libsass-0.19.4-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:845a9573b25c141164972d498855f4ad29367c09e6d76fad12955ad0e1c83013"},
-    {file = "libsass-0.19.4-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:81a013a4c2a614927fd1ef7a386eddabbba695cbb02defe8f31cf495106e974c"},
-    {file = "libsass-0.19.4-cp35-cp35m-win32.whl", hash = "sha256:fcb7ab4dc81889e5fc99cafbc2017bc76996f9992fc6b175f7a80edac61d71df"},
-    {file = "libsass-0.19.4-cp35-cp35m-win_amd64.whl", hash = "sha256:fc5f8336750f76f1bfae82f7e9e89ae71438d26fc4597e3ab4c05ca8fcd41d8a"},
-    {file = "libsass-0.19.4-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:53f87116e7441827878bd79bbad8debac23e1930423f61ab8d837ec4a4c36e0c"},
-    {file = "libsass-0.19.4-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:9b59afa0d755089c4165516400a39a289b796b5612eeef5736ab7a1ebf96a67c"},
-    {file = "libsass-0.19.4-cp36-cp36m-win32.whl", hash = "sha256:c93df526eeef90b1ea4799c1d33b6cd5aea3e9f4633738fb95c1287c13e6b404"},
-    {file = "libsass-0.19.4-cp36-cp36m-win_amd64.whl", hash = "sha256:0fd8b4337b3b101c6e6afda9112cc0dc4bacb9133b59d75d65968c7317aa3272"},
-    {file = "libsass-0.19.4-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:003a65b4facb4c5dbace53fb0f70f61c5aae056a04b4d112a198c3c9674b31f2"},
-    {file = "libsass-0.19.4-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:338e9ae066bf1fde874e335324d5355c52d2081d978b4f74fc59536564b35b08"},
-    {file = "libsass-0.19.4-cp37-cp37m-win32.whl", hash = "sha256:e318f06f06847ff49b1f8d086ac9ebce1e63404f7ea329adab92f4f16ba0e00e"},
-    {file = "libsass-0.19.4-cp37-cp37m-win_amd64.whl", hash = "sha256:a7e685466448c9b1bf98243339793978f654a1151eb5c975f09b83c7a226f4c1"},
-    {file = "libsass-0.19.4-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:0fb4399f7bbecab7b181f2c2d82c3a0ba2916bf9169714b96e425355a5b23b9f"},
-    {file = "libsass-0.19.4-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:6a51393d75f6e3c812785b0fa0b7d67c54258c28011921f204643b55f7355ec0"},
-    {file = "libsass-0.19.4.tar.gz", hash = "sha256:8b5b6d1a7c4ea1d954e0982b04474cc076286493f6af2d0a13c2e950fbe0be95"},
+    {file = "libsass-0.20.0-cp27-cp27m-win32.whl", hash = "sha256:98f6dee9850b29e62977a963e3beb3cfeb98b128a267d59d2c3d675e298c8d57"},
+    {file = "libsass-0.20.0-cp27-cp27m-win_amd64.whl", hash = "sha256:b077261a04ba1c213e932943208471972c5230222acb7fa97373e55a40872cbb"},
+    {file = "libsass-0.20.0-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:e6a547c0aa731dcb4ed71f198e814bee0400ce04d553f3f12a53bc3a17f2a481"},
+    {file = "libsass-0.20.0-cp36-abi3-manylinux1_x86_64.whl", hash = "sha256:74f6fb8da58179b5d86586bc045c16d93d55074bc7bb48b6354a4da7ac9f9dfd"},
+    {file = "libsass-0.20.0-cp36-cp36m-win32.whl", hash = "sha256:a43f3830d83ad9a7f5013c05ce239ca71744d0780dad906587302ac5257bce60"},
+    {file = "libsass-0.20.0-cp36-cp36m-win_amd64.whl", hash = "sha256:fd19c8f73f70ffc6cbcca8139da08ea9a71fc48e7dfc4bb236ad88ab2d6558f1"},
+    {file = "libsass-0.20.0-cp37-cp37m-win32.whl", hash = "sha256:7555d9b24e79943cfafac44dbb4ca7e62105c038de7c6b999838c9ff7b88645d"},
+    {file = "libsass-0.20.0-cp37-cp37m-win_amd64.whl", hash = "sha256:794f4f4661667263e7feafe5cc866e3746c7c8a9192b2aa9afffdadcbc91c687"},
+    {file = "libsass-0.20.0-cp38-cp38-win32.whl", hash = "sha256:3bc0d68778b30b5fa83199e18795314f64b26ca5871e026343e63934f616f7f7"},
+    {file = "libsass-0.20.0-cp38-cp38-win_amd64.whl", hash = "sha256:5c8ff562b233734fbc72b23bb862cc6a6f70b1e9bf85a58422aa75108b94783b"},
+    {file = "libsass-0.20.0.tar.gz", hash = "sha256:b7452f1df274b166dc22ee2e9154c4adca619bcbbdf8041a7aa05f372a1dacbc"},
 ]
 license-expression = [
     {file = "license-expression-1.2.tar.gz", hash = "sha256:7960e1dfdf20d127e75ead931476f2b5c7556df05b117a73880b22ade17d1abc"},
