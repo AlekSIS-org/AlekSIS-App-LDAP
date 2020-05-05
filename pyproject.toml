@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AlekSIS-App-LDAP"
-version = "2.0a2"
+version = "2.0a3.dev0"
 packages = [
     { include = "aleksis" }
 ]
@@ -28,7 +28,7 @@ classifiers = [
 python = "^3.7"
 django-ldapdb = "^1.4.0"
 tqdm = "^4.44.1"
-AlekSIS = "^2.0a2"
+AlekSIS = "^2.0a3.dev0"
 
 [build-system]
 requires = ["poetry>=1.0"]
