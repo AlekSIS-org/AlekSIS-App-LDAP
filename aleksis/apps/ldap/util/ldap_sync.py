@@ -226,7 +226,7 @@ def ldap_sync_from_user(user, dn, attrs):
 
             # Apply regex replace from config
             patterns = get_site_preferences()[setting_name + "_re"]
-            templates = get_site_preferences()[setting_name + "_request"]
+            templates = get_site_preferences()[setting_name + "_replace"]
             value = apply_templates(value, patterns, templates)
 
             # Opportunistically convert LDAP string value to Python object
