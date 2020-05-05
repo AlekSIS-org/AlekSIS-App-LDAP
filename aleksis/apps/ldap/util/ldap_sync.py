@@ -86,7 +86,7 @@ def update_dynamic_preferences():
                 name = setting_name + "_re"
                 verbose_name = _(
                     f"Regular expression to match LDAP value for"
-                    "{field.verbose_name} on {model._meta.label} against"
+                    f" {field.verbose_name} on {model._meta.label} against"
                 )
                 required = False
                 default = ""
