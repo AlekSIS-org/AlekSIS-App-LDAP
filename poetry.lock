@@ -68,11 +68,11 @@ extras = ["phonenumbers"]
 version = ">=3.0,<4.0"
 
 [package.dependencies.django-two-factor-auth]
-extras = ["sms", "call", "phonenumbers", "yubikey"]
+extras = ["phonenumbers", "call", "yubikey", "sms"]
 version = ">=1.11.0,<2.0.0"
 
 [package.dependencies.dynaconf]
-extras = ["toml", "yaml", "ini"]
+extras = ["toml", "ini", "yaml"]
 version = ">=2.0,<3.0"
 
 [package.extras]
@@ -939,10 +939,10 @@ description = "flake8 plugin to call black as a code style validator"
 name = "flake8-black"
 optional = false
 python-versions = "*"
-version = "0.1.2"
+version = "0.2.0"
 
 [package.dependencies]
-black = ">=19.3b0"
+black = "*"
 flake8 = ">=3.0.0"
 
 [[package]]
@@ -1981,7 +1981,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "b5d6b5eb89531b1a6c28e00ede1f09993213a20dc818b07bdca60c6a45eaa4db"
+content-hash = "a5bd85ed14347af8f9ce09f80be4d11b1e5cbefbf1f98106a53e5f639ee3bf79"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -2293,7 +2293,7 @@ flake8-bandit = [
     {file = "flake8_bandit-2.1.2.tar.gz", hash = "sha256:687fc8da2e4a239b206af2e54a90093572a60d0954f3054e23690739b0b0de3b"},
 ]
 flake8-black = [
-    {file = "flake8-black-0.1.2.tar.gz", hash = "sha256:b79d8d868bd42dc2c1f27469b92a984ecab3579ad285a8708ea5f19bf6c1f3a2"},
+    {file = "flake8-black-0.2.0.tar.gz", hash = "sha256:10e7ff9f81f637a9471684e5624d6a32b11cba362b38df4e20fc8f761184440b"},
 ]
 flake8-builtins = [
     {file = "flake8-builtins-1.5.3.tar.gz", hash = "sha256:09998853b2405e98e61d2ff3027c47033adbdc17f9fe44ca58443d876eb00f3b"},
@@ -2359,12 +2359,14 @@ jinja2 = [
     {file = "Jinja2-2.11.2.tar.gz", hash = "sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0"},
 ]
 libsass = [
+    {file = "libsass-0.20.0-cp27-cp27m-macosx_10_14_intel.whl", hash = "sha256:107c409524c6a4ed14410fa9dafa9ee59c6bd3ecae75d73af749ab2b75685726"},
     {file = "libsass-0.20.0-cp27-cp27m-win32.whl", hash = "sha256:98f6dee9850b29e62977a963e3beb3cfeb98b128a267d59d2c3d675e298c8d57"},
     {file = "libsass-0.20.0-cp27-cp27m-win_amd64.whl", hash = "sha256:b077261a04ba1c213e932943208471972c5230222acb7fa97373e55a40872cbb"},
     {file = "libsass-0.20.0-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:e6a547c0aa731dcb4ed71f198e814bee0400ce04d553f3f12a53bc3a17f2a481"},
     {file = "libsass-0.20.0-cp36-abi3-manylinux1_x86_64.whl", hash = "sha256:74f6fb8da58179b5d86586bc045c16d93d55074bc7bb48b6354a4da7ac9f9dfd"},
     {file = "libsass-0.20.0-cp36-cp36m-win32.whl", hash = "sha256:a43f3830d83ad9a7f5013c05ce239ca71744d0780dad906587302ac5257bce60"},
     {file = "libsass-0.20.0-cp36-cp36m-win_amd64.whl", hash = "sha256:fd19c8f73f70ffc6cbcca8139da08ea9a71fc48e7dfc4bb236ad88ab2d6558f1"},
+    {file = "libsass-0.20.0-cp37-abi3-macosx_10_14_x86_64.whl", hash = "sha256:8cf72552b39e78a1852132e16b706406bc76029fe3001583284ece8d8752a60a"},
     {file = "libsass-0.20.0-cp37-cp37m-win32.whl", hash = "sha256:7555d9b24e79943cfafac44dbb4ca7e62105c038de7c6b999838c9ff7b88645d"},
     {file = "libsass-0.20.0-cp37-cp37m-win_amd64.whl", hash = "sha256:794f4f4661667263e7feafe5cc866e3746c7c8a9192b2aa9afffdadcbc91c687"},
     {file = "libsass-0.20.0-cp38-cp38-win32.whl", hash = "sha256:3bc0d68778b30b5fa83199e18795314f64b26ca5871e026343e63934f616f7f7"},
