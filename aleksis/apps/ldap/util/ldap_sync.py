@@ -319,9 +319,9 @@ def mass_ldap_import():
         group_dict = {obj.ldap_dn: obj for obj in group_objects}
 
     # Guess LDAP username field from user filter
-    uid_field = re.search(r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.filterstr).group(
-        1
-    )
+    uid_field = re.search(
+        r"([a-zA-Z]+)=%\(user\)s", backend.settings.USER_SEARCH.searches[0].filterstr
+    ).group(1)
 
     # Synchronise user data for all found users
     ldap_users = backend.settings.USER_SEARCH.execute(connection, {"user": "*"}, escape=False)
