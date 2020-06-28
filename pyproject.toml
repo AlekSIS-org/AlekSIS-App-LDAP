@@ -28,7 +28,7 @@ classifiers = [
 python = "^3.7"
 django-ldapdb = "^1.4.0"
 tqdm = "^4.44.1"
-AlekSIS = "^2.0a2"
+AlekSIS = { version = "^2.0a2", extras = ["ldap"] }
 
 [tool.poetry.dev-dependencies]
 sphinx = "^3.0"
