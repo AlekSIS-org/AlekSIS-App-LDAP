@@ -63,16 +63,20 @@ requests = ">=2.22,<3.0"
 rules = ">=2.2,<3.0"
 spdx-license-list = ">=0.4.0,<0.5.0"
 
+[package.dependencies.django-auth-ldap]
+optional = true
+version = ">=2.0,<3.0"
+
 [package.dependencies.django-phonenumber-field]
 extras = ["phonenumbers"]
 version = ">=3.0,<4.0"
 
 [package.dependencies.django-two-factor-auth]
-extras = ["phonenumbers", "call", "yubikey", "sms"]
+extras = ["call", "phonenumbers", "yubikey", "sms"]
 version = ">=1.11.0,<2.0.0"
 
 [package.dependencies.dynaconf]
-extras = ["toml", "ini", "yaml"]
+extras = ["ini", "toml", "yaml"]
 version = ">=2.0,<3.0"
 
 [package.extras]
@@ -326,6 +330,18 @@ version = "1.0.4"
 
 [package.dependencies]
 django = "*"
+
+[[package]]
+category = "main"
+description = "Django LDAP authentication backend."
+name = "django-auth-ldap"
+optional = false
+python-versions = ">=3.5"
+version = "2.2.0"
+
+[package.dependencies]
+Django = ">=1.11"
+python-ldap = ">=3.1"
 
 [[package]]
 category = "main"
@@ -996,18 +1012,15 @@ description = "flake8 plugin that integrates isort ."
 name = "flake8-isort"
 optional = false
 python-versions = "*"
-version = "3.0.0"
+version = "4.0.0"
 
 [package.dependencies]
-flake8 = ">=3.2.1"
-testfixtures = "*"
-
-[package.dependencies.isort]
-extras = ["pyproject"]
-version = ">=4.3.5"
+flake8 = ">=3.2.1,<4"
+isort = ">=4.3.5,<6"
+testfixtures = ">=6.8.0,<7"
 
 [package.extras]
-test = ["pytest"]
+test = ["pytest (>=4.0.2,<6)", "toml"]
 
 [[package]]
 category = "dev"
@@ -1981,7 +1994,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "a5bd85ed14347af8f9ce09f80be4d11b1e5cbefbf1f98106a53e5f639ee3bf79"
+content-hash = "7070ea8b66a7243fa6d7a4f13e90347841738318262fbbb2128dbcb1ffd95d06"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -2108,6 +2121,10 @@ django-any-js = [
 django-appconf = [
     {file = "django-appconf-1.0.4.tar.gz", hash = "sha256:be58deb54a43d77d2e1621fe59f787681376d3cd0b8bd8e4758ef6c3a6453380"},
     {file = "django_appconf-1.0.4-py2.py3-none-any.whl", hash = "sha256:1b1d0e1069c843ebe8ae5aa48ec52403b1440402b320c3e3a206a0907e97bb06"},
+]
+django-auth-ldap = [
+    {file = "django-auth-ldap-2.2.0.tar.gz", hash = "sha256:11af1773b08613339d2c3a0cec1308a4d563518f17b1719c3759994d0b4d04bf"},
+    {file = "django_auth_ldap-2.2.0-py3-none-any.whl", hash = "sha256:0ed2d88d81c39be915a9ab53b97ec0a33a3d16055518ab4c9bcffe8236d40370"},
 ]
 django-bleach = [
     {file = "django-bleach-0.6.1.tar.gz", hash = "sha256:674709c26040618aff0741ce8261fd151e5ead405bd50568c2034662d69daac3"},
@@ -2312,8 +2329,8 @@ flake8-fixme = [
     {file = "flake8_fixme-1.1.1-py2.py3-none-any.whl", hash = "sha256:226a6f2ef916730899f29ac140bed5d4a17e5aba79f00a0e3ae1eff1997cb1ac"},
 ]
 flake8-isort = [
-    {file = "flake8-isort-3.0.0.tar.gz", hash = "sha256:3ce227b5c5342b6d63937d3863e8de8783ae21863cb035cf992cdb0ba5990aa3"},
-    {file = "flake8_isort-3.0.0-py2.py3-none-any.whl", hash = "sha256:f5322a85cea89998e0df954162fd35a1f1e5b5eb4fc0c79b5975aa2799106baa"},
+    {file = "flake8-isort-4.0.0.tar.gz", hash = "sha256:2b91300f4f1926b396c2c90185844eb1a3d5ec39ea6138832d119da0a208f4d9"},
+    {file = "flake8_isort-4.0.0-py2.py3-none-any.whl", hash = "sha256:729cd6ef9ba3659512dee337687c05d79c78e1215fdf921ed67e5fe46cce2f3c"},
 ]
 flake8-mypy = [
     {file = "flake8-mypy-17.8.0.tar.gz", hash = "sha256:47120db63aff631ee1f84bac6fe8e64731dc66da3efc1c51f85e15ade4a3ba18"},
@@ -2680,6 +2697,7 @@ regex = [
     {file = "regex-2020.5.14.tar.gz", hash = "sha256:ce450ffbfec93821ab1fea94779a8440e10cf63819be6e176eb1973a6017aff5"},
 ]
 requests = [
+    {file = "requests-2.23.0-py2.7.egg", hash = "sha256:5d2d0ffbb515f39417009a46c14256291061ac01ba8f875b90cad137de83beb4"},
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
     {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},
 ]
