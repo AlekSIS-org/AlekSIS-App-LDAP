@@ -36,21 +36,6 @@ class LDAPSyncCreateMissingPersons(BooleanPreference):
 
 
 @site_preferences_registry.register
-class LDAPMatchingFields(ChoicePreference):
-    section = ldap
-    name = "matching_fields"
-    default = ""
-    required = False
-    verbose_name = _("LDAP sync matching fields")
-    choices = [
-        ("", "-----"),
-        ("match-email", _("Match only on email")),
-        ("match-name", _("Match only on name")),
-        ("match-email-name", _("Match on email and name")),
-    ]
-
-
-@site_preferences_registry.register
 class EnableLDAPGroupSync(BooleanPreference):
     section = ldap
     name = "enable_group_sync"

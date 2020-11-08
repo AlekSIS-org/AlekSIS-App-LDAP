@@ -10,7 +10,7 @@ from django.db.models.fields.files import FileField
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from dynamic_preferences.types import StringPreference
+from dynamic_preferences.types import MultipleChoicePreference, StringPreference
 from tqdm import tqdm
 
 from aleksis.core.registries import site_preferences_registry
@@ -100,6 +100,15 @@ def update_dynamic_preferences():
                 )
                 required = False
                 default = ""
+
+    @site_preferences_registry.register
+    class LDAPMatchingFields(MultipleChoicePreference):
+        section = section_ldap
+        name = "matching_fields"
+        default = []
+        required = False
+        verbose_name = _("LDAP sync matching fields")
+        choices = [("", "-----")} + [(field.name, field.name) for field in Perosn.syncable_fields()]
 
 
 def apply_templates(value, patterns, templates, separator="|"):
