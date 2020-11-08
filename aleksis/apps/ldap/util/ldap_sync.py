@@ -282,7 +282,7 @@ def ldap_sync_from_groups(group_infos):
         # FIXME FInd a way to throw exceptions correctly but still continue import
         try:
             with transaction.atomic():
-                group, created = Group.objects.update_or_create(
+                group, created = Group.objects.select_related(None).update_or_create(
                     ldap_dn=ldap_group[0].lower(),
                     defaults={"short_name": short_name, "name": name},
                 )
