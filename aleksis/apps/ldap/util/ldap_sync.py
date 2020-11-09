@@ -108,7 +108,7 @@ def update_dynamic_preferences():
         default = []
         required = False
         verbose_name = _("LDAP sync matching fields")
-        choices = [(field.name, field.name) for field in Perosn.syncable_fields()]
+        choices = [(field.name, field.name) for field in Person.syncable_fields()]
 
 
 def apply_templates(value, patterns, templates, separator="|"):
