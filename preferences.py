@@ -27,8 +27,8 @@ class DefaultShell(StringPreference):
 @site_preferences_registry.register
 class DefaultPrimaryGid(IntegerPreference):
     section = posix
-    name = "gid_number"
-    default = "100"
+    name = "gid"
+    default = 100
     required = False
     verbose_name = _("Default primary GID number")
 
@@ -36,8 +36,8 @@ class DefaultPrimaryGid(IntegerPreference):
 @site_preferences_registry.register
 class MinGidNumber(IntegerPreference):
     section = posix
-    name = "min_gid_number"
-    default = "99"
+    name = "min_gid"
+    default = 1000
     required = False
     verbose_name = _("Minimal GID number")
 
@@ -45,8 +45,8 @@ class MinGidNumber(IntegerPreference):
 @site_preferences_registry.register
 class MinUidNumber(IntegerPreference):
     section = posix
-    name = "shell"
-    default = "999"
+    name = "min_uid"
+    default = 1000
     required = False
     verbose_name = _("Minimum UID number")
 
@@ -63,7 +63,7 @@ class UIDRegex(StringPreference):
 @site_preferences_registry.register
 class DisallowedUids(LongStringPreference):
     section = posix
-    name = "shell"
-    default = ""
+    name = "disallowed_uids"
+    default = "bin,daemon,Debian-exim,freerad,games,gnats,irc,list,lp,mail,man,messagebus,news,nslcd,ntp,openldap,postfix,postgres,proxy,root,sshd,sssd,statd,sync,sys,systemd-bus-proxy,systemd-network,systemd-resolve,systemd-timesync,uucp,www-data,webmaster, hostmaster, postmaster"
     required = False
     verbose_name = _("Comma-seperated list of disallowed usernames")

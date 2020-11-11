@@ -10,28 +10,23 @@ def get_default_value_shell_preferences():
     return get_site_preferences()["posix__shell"]
 
 
-def get_default_value_gid_preferences():
-    return get_site_preferences()["posix__gid_number"]
+def get_default_value_primary_gid_preferences():
+    return get_site_preferences()["posix__gid"]
 
 
-def validate_min_value_uid_number_preferences(value):
-    if value < get_site_preferences()["posix__min_uid_number"]:
+def validate_min_value_uid_preferences(value):
+    if value < get_site_preferences()["posix__min_uid"]:
         raise ValidationError(_("Value smaller than minimum uid number!"))
 
 
-def get_next_free_uid_number():
-    return PersonPosixAttrs.objects.order_by("-uid_number")[0].uid_number + 1
+def validate_min_value_gid_preferences(value):
+    if value < get_site_preferences()["posix__min_gid"]:
+        raise ValidationError(_("Value smaller than minimum gid number!"))
 
 
-def validate_uid_number(value):
-    if PersonPosixAttrs.objects.get(uid_number=value).exists():
-        raise ValidationError(_("Account with this UID number already exists!"))
-
-
-def validate_free_username(value):
-        disallowed_uids = get_site_preferences()["posix__disallowed_uids"].split(",")
-        if value in disallowed_uids:
-            raise ValidationError(_("Username not allowed"))
+def validate_username_allowed(value):
+    if value in get_site_preferences()["posix__disallowed_uids"].split(","):
+        raise ValidationError(_("Username not allowed!"))
 
 
 class SSHKey(ExtensibleModel):
@@ -66,29 +61,41 @@ class PersonPosixAttrs(ExtensibleModel):
         on_delete=models.CASCADE,
     )
 
-    uid_number = models.PositiveIntegerField(
+    uid = models.PositiveIntegerField(
         verbose_name=_("UID Number"),
-        validators=[validate_min_value_uid_number_preferences],
+        unique=True,
+        validators=[validate_min_value_uid_preferences],
     )
     home_directory = models.CharField(verbose_name=_("Home directory"))
     login_shell = models.CharField(
         verbose_name=_("Login shell"), default=get_default_value_shell_preferences
     )
-    gid_number = models.PositiveIntegerField(
+    primary_gid = models.PositiveIntegerField(
         verbose_name=_("Primary GID Number"),
-        default=get_default_value_gid_preferences,
+        default=get_default_value_primary_gid_preferences,
     )
-    uid = models.CharField(
+    username = models.CharField(
         verbose_name=_("UID"),
         unique=True,
-        default=get_next_free_uid_number,
         validators=[
-            RegexValidator(regex=get_site_preferences()["posix__uid_regex"]),
+            RegexValidator(regex=get_site_preferences()["posix__username_regex"]),
             RegexValidator(regex=r"^[A-Za-z0-9_.][A-Za-z0-9_.-]*$"),
-            validate_uid_number,
-            validate_free_username,
+            validate_username_allowed,
         ],
     )
+
+
+    def clean_username(self) -> None:
+        if self.person.user.username:
+            self.username = self.person.user.username
+        else:
+            self.username = ""
+
+
+    def clean_uid(self) -> None:
+        if not self.uid:
+            self.uid = Max("uid") + 1
+
 
     class Meta:
         verbose_name = _("POSIX Attributes")
@@ -104,7 +111,13 @@ class GroupPosixAttrs(ExtensibleModel):
         on_delete=models.CASCADE,
     )
 
-    gidNumber = models.IntegerField(verbose_name=_("GID Number"))
+    gid = models.IntegerField(verbose_name=_("GID Number"), unique=True, validators=[validate_min_value_gid_preferences])
+
+
+    def clean_gid(self) -> None:
+        if not self.gid:
+            self.gid = Max("gid") + 1
+
 
     class Meta:
         verbose_name = _("POSIX Attributes")
