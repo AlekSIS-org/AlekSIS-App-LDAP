@@ -75,7 +75,7 @@ class PersonPosixAttrs(ExtensibleModel):
         default=get_default_value_primary_gid_preferences,
     )
     username = models.CharField(
-        verbose_name=_("UID"),
+        verbose_name=_("Username"),
         unique=True,
         validators=[
             RegexValidator(regex=get_site_preferences()["posix__username_regex"]),
@@ -86,7 +86,7 @@ class PersonPosixAttrs(ExtensibleModel):
 
 
     def clean_username(self) -> None:
-        if self.person.user.username:
+        if self.person.user:
             self.username = self.person.user.username
         else:
             self.username = ""
@@ -94,7 +94,7 @@ class PersonPosixAttrs(ExtensibleModel):
 
     def clean_uid(self) -> None:
         if not self.uid:
-            self.uid = Max("uid") + 1
+            self.uid = models.Max("uid") + 1
 
 
     class Meta:
@@ -116,7 +116,7 @@ class GroupPosixAttrs(ExtensibleModel):
 
     def clean_gid(self) -> None:
         if not self.gid:
-            self.gid = Max("gid") + 1
+            self.gid = models.Max("gid") + 1
 
 
     class Meta:
