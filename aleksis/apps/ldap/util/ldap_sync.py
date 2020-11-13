@@ -135,12 +135,17 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missi
     associated with the model field, then gets this attribute and pythonises it.
 
     Raises KeyError if the desired field is not in the LDAP entry.
+    Raises AttributeError if the requested field is not configured to be synced.
     """
     setting_name = "ldap__" + setting_name_from_field(model, field)
 
     # Try sync if preference for this field is non-empty
     ldap_field = get_site_preferences()[setting_name].lower()
-    if ldap_field and ldap_field in attrs:
+
+    if not ldap_field:
+        raise AttributeError(f"Field {field.name} not configured to be synced.")
+
+    if ldap_field in attrs:
         value = attrs[ldap_field][0]
 
         # Apply regex replace from config
@@ -152,9 +157,11 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missi
         value = from_ldap(value, field, dn, ldap_field, instance)
 
         return value
-
-    if not allow_missing:
-        raise KeyError(f"Matching field {ldap_field} not in attributes of {dn}")
+    else:
+        if allow_missing:
+            logger.warn(f"Matching field {ldap_field} not in attributes of {dn}")
+        else:
+            raise KeyError(f"Matching field {ldap_field} not in attributes of {dn}")
 
 
 @transaction.atomic
@@ -256,7 +263,12 @@ def ldap_sync_from_user(user, dn, attrs):
 
     # Synchronise additional fields if enabled
     for field in Person.syncable_fields():
-        value = get_ldap_value_for_field(Person, field, attrs, dn, person, allow_missing=True)
+        try:
+            value = get_ldap_value_for_field(Person, field, attrs, dn, person, allow_missing=True)
+        except AttributeError:
+            # A syncable field is not configured to sync
+            continue
+
         setattr(person, field.name, value)
         logger.debug(f"Field {field.name} set to {value} for {person}")
 
