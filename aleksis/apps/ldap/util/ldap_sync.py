@@ -238,7 +238,12 @@ def ldap_sync_from_user(user, dn, attrs):
         # Match on all fields selected in preferences
         fields_map = {f.name: f for f in Person.syncable_fields()}
         for field_name in get_site_preferences()["ldap__matching_fields"]:
-            value = get_ldap_value_for_field(Person, fields_map[field_name], attrs, dn)
+            try:
+                value = get_ldap_value_for_field(Person, fields_map[field_name], attrs, dn)
+            except KeyError:
+                # Field is not set in LDAP, match on remaining fields
+                continue
+
             matches[field_name] = value
         # Pre-fill all mandatory non-matching fields from User object
         for missing_key in ("first_name", "last_name", "email"):
