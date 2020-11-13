@@ -128,7 +128,7 @@ def apply_templates(value, patterns, templates, separator="|"):
 
     return value
 
-def get_ldap_value_for_field(model, field, attrs, dn, instance=None):
+def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missing=False):
     """Get the value of a field in LDAP attributes.
 
     Looks at the site preference for sync fields to determine which LDAP field is
@@ -152,7 +152,8 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None):
         value = from_ldap(value, field, dn, ldap_field, instance)
 
         return value
-    else:
+
+    if not allow_missing:
         raise KeyError(f"Matching field {ldap_field} not in attributes of {dn}")
 
 
@@ -228,8 +229,9 @@ def ldap_sync_from_user(user, dn, attrs):
         defaults = {}
 
         # Match on all fields selected in preferences
+        fields_map = {f.name: f for f in Person.syncable_fields()}
         for field_name in get_site_preferences()["ldap__matching_fields"]:
-            value = get_ldap_value_for_field(Person, field, attrs, dn)
+            value = get_ldap_value_for_field(Person, fields_map[field_name], attrs, dn)
             matches[field_name] = value
         # Pre-fill all mandatory non-matching fields from User object
         for missing_key in ("first_name", "last_name", "email"):
@@ -254,7 +256,7 @@ def ldap_sync_from_user(user, dn, attrs):
 
     # Synchronise additional fields if enabled
     for field in Person.syncable_fields():
-        value = get_ldap_value_for_field(Person, field, attrs, dn, person)
+        value = get_ldap_value_for_field(Person, field, attrs, dn, person, allow_missing=True)
         setattr(person, field.name, value)
         logger.debug(f"Field {field.name} set to {value} for {person}")
 
