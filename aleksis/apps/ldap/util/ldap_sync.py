@@ -159,9 +159,9 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missi
         return value
     else:
         if allow_missing:
-            logger.warn(f"Matching field {ldap_field} not in attributes of {dn}")
+            logger.warn(f"Field {ldap_field} not in attributes of {dn}")
         else:
-            raise KeyError(f"Matching field {ldap_field} not in attributes of {dn}")
+            raise KeyError(f"Field {ldap_field} not in attributes of {dn}")
 
 
 @transaction.atomic
