@@ -10,7 +10,7 @@ from django.db.models.fields.files import FileField
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from dynamic_preferences.types import StringPreference
+from dynamic_preferences.types import MultipleChoicePreference, StringPreference
 from tqdm import tqdm
 
 from aleksis.core.registries import site_preferences_registry
@@ -38,7 +38,7 @@ def ldap_field_to_filename(dn, fieldname):
     return f"{slugify(dn)}__{slugify(fieldname)}"
 
 
-def from_ldap(value, instance, field, dn, ldap_field):
+def from_ldap(value, field, dn, ldap_field, instance=None):
     """Convert an LDAP value to the Python type of the target field.
 
     This conversion is prone to error because LDAP deliberately breaks
@@ -50,7 +50,7 @@ def from_ldap(value, instance, field, dn, ldap_field):
     if isinstance(field, (fields.DateField, fields.DateTimeField)):
         # Be opportunistic, but keep old value if conversion fails
         value = datetime_from_ldap(value) or value
-    elif isinstance(field, FileField):
+    elif isinstance(field, FileField) and instance is not None:
         name = ldap_field_to_filename(dn, ldap_field)
         content = File(io.BytesIO(value))
 
@@ -101,6 +101,15 @@ def update_dynamic_preferences():
                 required = False
                 default = ""
 
+    @site_preferences_registry.register
+    class LDAPMatchingFields(MultipleChoicePreference):
+        section = section_ldap
+        name = "matching_fields"
+        default = []
+        required = False
+        verbose_name = _("LDAP sync matching fields")
+        choices = [(field.name, field.name) for field in Person.syncable_fields()]
+
 
 def apply_templates(value, patterns, templates, separator="|"):
     """Regex-replace patterns in value in order."""
@@ -118,6 +127,41 @@ def apply_templates(value, patterns, templates, separator="|"):
             value = match.expand(template)
 
     return value
+
+def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missing=False):
+    """Get the value of a field in LDAP attributes.
+
+    Looks at the site preference for sync fields to determine which LDAP field is
+    associated with the model field, then gets this attribute and pythonises it.
+
+    Raises KeyError if the desired field is not in the LDAP entry.
+    Raises AttributeError if the requested field is not configured to be synced.
+    """
+    setting_name = "ldap__" + setting_name_from_field(model, field)
+
+    # Try sync if preference for this field is non-empty
+    ldap_field = get_site_preferences()[setting_name].lower()
+
+    if not ldap_field:
+        raise AttributeError(f"Field {field.name} not configured to be synced.")
+
+    if ldap_field in attrs:
+        value = attrs[ldap_field][0]
+
+        # Apply regex replace from config
+        patterns = get_site_preferences()[setting_name + "_re"]
+        templates = get_site_preferences()[setting_name + "_replace"]
+        value = apply_templates(value, patterns, templates)
+
+        # Opportunistically convert LDAP string value to Python object
+        value = from_ldap(value, field, dn, ldap_field, instance)
+
+        return value
+    else:
+        if allow_missing:
+            logger.warn(f"Field {ldap_field} not in attributes of {dn}")
+        else:
+            raise KeyError(f"Field {ldap_field} not in attributes of {dn}")
 
 
 @transaction.atomic
@@ -190,14 +234,25 @@ def ldap_sync_from_user(user, dn, attrs):
         # Build filter criteria depending on config
         matches = {}
         defaults = {}
-        if "-email" in get_site_preferences()["ldap__matching_fields"]:
-            matches["email"] = user.email
-            defaults["first_name"] = user.first_name
-            defaults["last_name"] = user.last_name
-        if "-name" in get_site_preferences()["ldap__matching_fields"]:
-            matches["first_name"] = user.first_name
-            matches["last_name"] = user.last_name
-            defaults["email"] = user.email
+
+        # Match on all fields selected in preferences
+        fields_map = {f.name: f for f in Person.syncable_fields()}
+        for field_name in get_site_preferences()["ldap__matching_fields"]:
+            try:
+                value = get_ldap_value_for_field(Person, fields_map[field_name], attrs, dn)
+            except KeyError:
+                # Field is not set in LDAP, match on remaining fields
+                continue
+
+            matches[field_name] = value
+
+        if not matches:
+            raise KeyError(f"No matching fields found for {dn}")
+
+        # Pre-fill all mandatory non-matching fields from User object
+        for missing_key in ("first_name", "last_name", "email"):
+            if missing_key not in matches:
+                defaults[missing_key] = getattr(user, missing_key)
 
         if get_site_preferences()["ldap__create_missing_persons"]:
             person, created = Person.objects.get_or_create(**matches, defaults=defaults)
@@ -217,23 +272,14 @@ def ldap_sync_from_user(user, dn, attrs):
 
     # Synchronise additional fields if enabled
     for field in Person.syncable_fields():
-        setting_name = "ldap__" + setting_name_from_field(Person, field)
+        try:
+            value = get_ldap_value_for_field(Person, field, attrs, dn, person, allow_missing=True)
+        except AttributeError:
+            # A syncable field is not configured to sync
+            continue
 
-        # Try sync if constance setting for this field is non-empty
-        ldap_field = get_site_preferences()[setting_name].lower()
-        if ldap_field and ldap_field in attrs:
-            value = attrs[ldap_field][0]
-
-            # Apply regex replace from config
-            patterns = get_site_preferences()[setting_name + "_re"]
-            templates = get_site_preferences()[setting_name + "_replace"]
-            value = apply_templates(value, patterns, templates)
-
-            # Opportunistically convert LDAP string value to Python object
-            value = from_ldap(value, person, field, dn, ldap_field)
-
-            setattr(person, field.name, value)
-            logger.debug(f"Field {field.name} set to {value} for {person}")
+        setattr(person, field.name, value)
+        logger.debug(f"Field {field.name} set to {value} for {person}")
 
     person.save()
     return person
@@ -349,7 +395,7 @@ def mass_ldap_import():
             except Person.MultipleObjectsReturned:
                 logger.error(f"More than one matching person for user {user.username}")
                 continue
-            except (DataError, IntegrityError, ValueError) as e:
+            except (DataError, IntegrityError, KeyError, ValueError) as e:
                 logger.error(f"Data error while synchronising user {user.username}:\n{e}")
                 continue
             else:
