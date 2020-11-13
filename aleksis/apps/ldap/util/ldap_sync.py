@@ -245,6 +245,10 @@ def ldap_sync_from_user(user, dn, attrs):
                 continue
 
             matches[field_name] = value
+
+        if not matches:
+            raise KeyError(f"No matching fields found for {dn}")
+
         # Pre-fill all mandatory non-matching fields from User object
         for missing_key in ("first_name", "last_name", "email"):
             if missing_key not in matches:
@@ -391,7 +395,7 @@ def mass_ldap_import():
             except Person.MultipleObjectsReturned:
                 logger.error(f"More than one matching person for user {user.username}")
                 continue
-            except (DataError, IntegrityError, ValueError) as e:
+            except (DataError, IntegrityError, KeyError, ValueError) as e:
                 logger.error(f"Data error while synchronising user {user.username}:\n{e}")
                 continue
             else:
