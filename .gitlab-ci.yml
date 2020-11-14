@@ -1,25 +1,9 @@
-image: registry.edugit.org/teckids/team-sysadmin/docker-images/python-pimped:latest
-
-stages:
-      - test
-      - build
-
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  FF_NETWORK_PER_BUILD: "true"
-
-cache:
-  key:
-    files:
-      - poetry.lock
-      - pyproject.toml
-  paths:
-    - .cache/pip
-    - .tox
-
 include:
+    - project: "AlekSIS/official/AlekSIS"
+      file: /ci/general.yml
     - project: "AlekSIS/official/AlekSIS"
       file: /ci/test.yml
     - project: "AlekSIS/official/AlekSIS"
       file: /ci/build_dist.yml
+    - project: "AlekSIS/official/AlekSIS"
+      file: /ci/deploy_pypi.yml

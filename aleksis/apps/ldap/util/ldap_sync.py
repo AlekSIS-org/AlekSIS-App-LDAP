@@ -128,6 +128,7 @@ def apply_templates(value, patterns, templates, separator="|"):
 
     return value
 
+
 def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missing=False):
     """Get the value of a field in LDAP attributes.
 
