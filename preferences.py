@@ -1,9 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 
 from dynamic_preferences.preferences import Section
-from dynamic_preferences.types import IntegerPreference, StringPreference
+from dynamic_preferences.types import IntegerPreference, StringPreference, LongStringPreference
 
-from .registries import site_preferences_registry
+from aleksis.core.registries import site_preferences_registry
 
 posix = Section("posix", verbose_name=_("POSIX"))
 
