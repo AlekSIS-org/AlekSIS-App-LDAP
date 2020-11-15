@@ -37,10 +37,7 @@ class SSHKey(ExtensibleModel):
     )
     public_key = models.TextField(verbose_name=_("SSH public key"))
     person = models.ForeignKey(
-        Person,
-        verbose_name=_("Person"),
-        on_delete=models.CASCADE,
-        related_name="ssh_keys",
+        Person, verbose_name=_("Person"), on_delete=models.CASCADE, related_name="ssh_keys",
     )
 
     def __str__(self) -> str:
@@ -62,17 +59,14 @@ class PersonPosixAttrs(ExtensibleModel):
     )
 
     uid = models.PositiveIntegerField(
-        verbose_name=_("UID Number"),
-        unique=True,
-        validators=[validate_min_value_uid_preferences],
+        verbose_name=_("UID Number"), unique=True, validators=[validate_min_value_uid_preferences],
     )
     home_directory = models.CharField(verbose_name=_("Home directory"))
     login_shell = models.CharField(
         verbose_name=_("Login shell"), default=get_default_value_shell_preferences
     )
     primary_gid = models.PositiveIntegerField(
-        verbose_name=_("Primary GID Number"),
-        default=get_default_value_primary_gid_preferences,
+        verbose_name=_("Primary GID Number"), default=get_default_value_primary_gid_preferences,
     )
     username = models.CharField(
         verbose_name=_("Username"),
@@ -84,18 +78,15 @@ class PersonPosixAttrs(ExtensibleModel):
         ],
     )
 
-
     def clean_username(self) -> None:
         if self.person.user:
             self.username = self.person.user.username
         else:
             self.username = ""
 
-
     def clean_uid(self) -> None:
         if not self.uid:
             self.uid = models.Max("uid") + 1
-
 
     class Meta:
         verbose_name = _("POSIX Attributes")
@@ -111,13 +102,13 @@ class GroupPosixAttrs(ExtensibleModel):
         on_delete=models.CASCADE,
     )
 
-    gid = models.IntegerField(verbose_name=_("GID Number"), unique=True, validators=[validate_min_value_gid_preferences])
-
+    gid = models.IntegerField(
+        verbose_name=_("GID Number"), unique=True, validators=[validate_min_value_gid_preferences]
+    )
 
     def clean_gid(self) -> None:
         if not self.gid:
             self.gid = models.Max("gid") + 1
-
 
     class Meta:
         verbose_name = _("POSIX Attributes")
