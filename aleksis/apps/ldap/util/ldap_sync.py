@@ -272,7 +272,7 @@ def ldap_sync_from_user(user, dn, attrs):
     for field in Person.syncable_fields():
         try:
             value = get_ldap_value_for_field(Person, field, attrs, dn, person)
-        except AttributeError, KeyError:
+        except (AttributeError, KeyError):
             # A syncable field is not configured to sync or missing in LDAP
             continue
 
