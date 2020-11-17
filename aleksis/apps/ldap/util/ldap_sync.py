@@ -129,7 +129,7 @@ def apply_templates(value, patterns, templates, separator="|"):
     return value
 
 
-def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missing=False):
+def get_ldap_value_for_field(model, field, attrs, dn, instance=None):
     """Get the value of a field in LDAP attributes.
 
     Looks at the site preference for sync fields to determine which LDAP field is
@@ -159,10 +159,7 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None, allow_missi
 
         return value
     else:
-        if allow_missing:
-            logger.warn(f"Field {ldap_field} not in attributes of {dn}")
-        else:
-            raise KeyError(f"Field {ldap_field} not in attributes of {dn}")
+        raise KeyError(f"Field {ldap_field} not in attributes of {dn}")
 
 
 @transaction.atomic
@@ -274,9 +271,9 @@ def ldap_sync_from_user(user, dn, attrs):
     # Synchronise additional fields if enabled
     for field in Person.syncable_fields():
         try:
-            value = get_ldap_value_for_field(Person, field, attrs, dn, person, allow_missing=True)
-        except AttributeError:
-            # A syncable field is not configured to sync
+            value = get_ldap_value_for_field(Person, field, attrs, dn, person)
+        except AttributeError, KeyError:
+            # A syncable field is not configured to sync or missing in LDAP
             continue
 
         setattr(person, field.name, value)
