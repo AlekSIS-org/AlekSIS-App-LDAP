@@ -7,6 +7,44 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "aleksis-builddeps"
+version = "1"
+description = "AlekSIS (School Information System) — Build/Dev dependencies for apps"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+black = ">=19.10b0,<20.0"
+django-stubs = ">=1.1,<2.0"
+flake8 = ">=3.7.9,<4.0.0"
+flake8-bandit = ">=2.1.2,<3.0.0"
+flake8-black = ">=0.2.0,<0.3.0"
+flake8-builtins = ">=1.4.1,<2.0.0"
+flake8-django = ">=1.0.0,<2.0.0"
+flake8-docstrings = ">=1.5.0,<2.0.0"
+flake8-fixme = ">=1.1.1,<2.0.0"
+flake8-isort = ">=4.0.0,<5.0.0"
+flake8-mypy = ">=17.8.0,<18.0.0"
+flake8-rst-docstrings = ">=0.0.13,<0.0.14"
+isort = ">=5.0.0,<6.0.0"
+pytest = ">=6.0,<7.0"
+pytest-cov = ">=2.8.1,<3.0.0"
+pytest-django = ">=3.7,<4.0"
+pytest-django-testing-postgresql = ">=0.1,<0.2"
+pytest-sugar = ">=0.9.2,<0.10.0"
+safety = ">=1.8.5,<2.0.0"
+selenium = ">=3.141.0,<4.0.0"
+sphinx = ">=3.0,<4.0"
+sphinx-autodoc-typehints = ">=1.7,<2.0"
+sphinxcontrib-django = ">=0.5.0,<0.6.0"
+
+[package.source]
+type = "legacy"
+url = "https://edugit.org/api/v4/projects/461/packages/pypi/simple"
+reference = "gitlab"
+
+[[package]]
 name = "aleksis-core"
 version = "2.0a3.dev0+20201114132749.88d92354"
 description = "AlekSIS (School Information System) — Core"
@@ -72,7 +110,7 @@ rules = ">=2.2,<3.0"
 spdx-license-list = ">=0.5.0,<0.6.0"
 
 [package.extras]
-celery = ["Celery[django,redis] (>=4.4.0,<5.0.0)", "celery-haystack (>=0.10.0,<0.11.0)", "django-celery-beat (>=2.0.0,<3.0.0)", "django-celery-email (>=3.0.0,<4.0.0)", "django-celery-results (>=1.1.2,<2.0.0)"]
+celery = ["Celery[redis,django] (>=4.4.0,<5.0.0)", "celery-haystack (>=0.10.0,<0.11.0)", "django-celery-beat (>=2.0.0,<3.0.0)", "django-celery-email (>=3.0.0,<4.0.0)", "django-celery-results (>=1.1.2,<2.0.0)"]
 ldap = ["django-auth-ldap (>=2.2,<3.0)"]
 
 [package.source]
@@ -1061,7 +1099,7 @@ flake8 = "*"
 
 [[package]]
 name = "flake8-rst-docstrings"
-version = "0.0.14"
+version = "0.0.13"
 description = "Python docstring reStructuredText (RST) validator"
 category = "dev"
 optional = false
@@ -1467,18 +1505,18 @@ testing = ["fields", "hunter", "process-tests (==2.0.2)", "six", "pytest-xdist",
 
 [[package]]
 name = "pytest-django"
-version = "4.1.0"
+version = "3.10.0"
 description = "A Django plugin for pytest."
 category = "dev"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.dependencies]
-pytest = ">=5.4.0"
+pytest = ">=3.6"
 
 [package.extras]
 docs = ["sphinx", "sphinx-rtd-theme"]
-testing = ["django", "django-configurations (>=2.0)"]
+testing = ["django", "django-configurations (>=2.0)", "six"]
 
 [[package]]
 name = "pytest-django-testing-postgresql"
@@ -2010,12 +2048,15 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "2a78177bf5da0787ddd186bcafbb6ec47fcc43882303fbefcdb9948fe445e7bd"
+content-hash = "5604fd4871837f90c765d4d85179a05ab27426da2b0490a4f69a9235d80f9799"
 
 [metadata.files]
 alabaster = [
     {file = "alabaster-0.7.12-py2.py3-none-any.whl", hash = "sha256:446438bdcca0e05bd45ea2de1668c1d9b032e1a9154c2c259092d77031ddd359"},
     {file = "alabaster-0.7.12.tar.gz", hash = "sha256:a661d72d58e6ea8a57f7a86e37d86716863ee5e92788398526d58b26a4e4dc02"},
+]
+aleksis-builddeps = [
+    {file = "AlekSIS-Builddeps-1.tar.gz", hash = "sha256:97a19597f422593cbdc438aabf17f95748126c8951df6ac7db7991fc99c108c4"},
 ]
 aleksis-core = [
     {file = "AlekSIS-Core-2.0a3.dev0+20201114132749.88d92354.tar.gz", hash = "sha256:be16d8b6478029ec86cc92389a5f679be85112cb20d18996c8ae95adf86690ba"},
@@ -2382,7 +2423,7 @@ flake8-polyfill = [
     {file = "flake8_polyfill-1.0.2-py2.py3-none-any.whl", hash = "sha256:12be6a34ee3ab795b19ca73505e7b55826d5f6ad7230d31b18e106400169b9e9"},
 ]
 flake8-rst-docstrings = [
-    {file = "flake8-rst-docstrings-0.0.14.tar.gz", hash = "sha256:8f8bcb18f1408b506dd8ba2c99af3eac6128f6911d4bf6ff874b94caa70182a2"},
+    {file = "flake8-rst-docstrings-0.0.13.tar.gz", hash = "sha256:b1b619d81d879b874533973ac04ee5d823fdbe8c9f3701bfe802bb41813997b4"},
 ]
 gitdb = [
     {file = "gitdb-4.0.5-py3-none-any.whl", hash = "sha256:91f36bfb1ab7949b3b40e23736db18231bf7593edada2ba5c3a174a7b23657ac"},
@@ -2691,8 +2732,8 @@ pytest-cov = [
     {file = "pytest_cov-2.10.1-py2.py3-none-any.whl", hash = "sha256:45ec2d5182f89a81fc3eb29e3d1ed3113b9e9a873bcddb2a71faaab066110191"},
 ]
 pytest-django = [
-    {file = "pytest-django-4.1.0.tar.gz", hash = "sha256:26f02c16d36fd4c8672390deebe3413678d89f30720c16efb8b2a6bf63b9041f"},
-    {file = "pytest_django-4.1.0-py3-none-any.whl", hash = "sha256:10e384e6b8912ded92db64c58be8139d9ae23fb8361e5fc139d8e4f8fc601bc2"},
+    {file = "pytest-django-3.10.0.tar.gz", hash = "sha256:4de6dbd077ed8606616958f77655fed0d5e3ee45159475671c7fa67596c6dba6"},
+    {file = "pytest_django-3.10.0-py2.py3-none-any.whl", hash = "sha256:c33e3d3da14d8409b125d825d4e74da17bb252191bf6fc3da6856e27a8b73ea4"},
 ]
 pytest-django-testing-postgresql = [
     {file = "pytest-django-testing-postgresql-0.1.post0.tar.gz", hash = "sha256:78b0c58930084cb4393407b2e5a2a3b8734c627b841ecef7d62d39bbfb8e8a45"},
