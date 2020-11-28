@@ -2,6 +2,8 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+import sshpubkeys
+
 from aleksis.core.mixins import ExtensibleModel
 from aleksis.core.models import Group, Person
 from aleksis.core.util.core_helpers import get_site_preferences
@@ -30,19 +32,29 @@ def validate_username_allowed(value):
         raise ValidationError(_("Username not allowed!"))
 
 
+def validate_ssh_key(value):
+    ssh_key = sshpubkeys.SSHKey(value)
+    try:
+        ssh_key.parse()
+    except sshpubkeys.InvalidKeyError as e:
+        raise ValidationError(_("Not a valid OpenSSH public key")) from e
+
+
 class SSHKey(ExtensibleModel):
     """Model to store SSH keys uploaded by persons."""
 
-    name = models.CharField(
-        verbose_name=_("Name of this Key"), max_length=255, default=_("SSH Public key")
-    )
-    public_key = models.TextField(verbose_name=_("SSH public key"))
     person = models.ForeignKey(
         Person, verbose_name=_("Person"), on_delete=models.CASCADE, related_name="ssh_keys",
     )
 
+    key_data = models.TextField(verbose_name=_("SSH public key"), validators=[validate_ssh_key])
+
+    @property
+    def ssh_key(self):
+        return sshpubkeys.SSHKey(self.key_data)
+
     def __str__(self) -> str:
-        return self.name
+        return self.ssh_key.comment
 
     class Meta:
         verbose_name = _("SSH key")
