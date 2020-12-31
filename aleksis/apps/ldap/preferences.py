@@ -36,6 +36,15 @@ class LDAPSyncCreateMissingPersons(BooleanPreference):
 
 
 @site_preferences_registry.register
+class LDAPPersonSyncOnLogin(BooleanPreference):
+    section = ldap
+    name = "person_sync_on_login"
+    default = True
+    required = False
+    verbose_name = _("Sync LDAP user with person on login")
+
+
+@site_preferences_registry.register
 class EnableLDAPGroupSync(BooleanPreference):
     section = ldap
     name = "enable_group_sync"
@@ -51,6 +60,7 @@ class LDAPGroupSyncFieldShortName(StringPreference):
     default = "cn"
     required = False
     verbose_name = _("Field for short name of group")
+    row = "ldap_group_sync_field_short_name"
 
 
 @site_preferences_registry.register
@@ -59,10 +69,9 @@ class LDAPGroupSyncFieldShortNameRE(StringPreference):
     name = "group_sync_field_short_name_re"
     default = ""
     required = False
-    verbose_name = _(
-        "Regular expression to match LDAP value for group short name against,"
-        "e.g. class_(?P<class>.*); separate multiple patterns by |"
-    )
+    verbose_name = _("Regular expression to match LDAP value for group short name against")
+    help_text = _("e.g. class_(?P<class>.*); separate multiple patterns by |")
+    row = "ldap_group_sync_field_short_name"
 
 
 @site_preferences_registry.register
@@ -71,10 +80,9 @@ class LDAPGroupSyncFieldShortNameReplace(StringPreference):
     name = "group_sync_field_short_name_replace"
     default = ""
     required = False
-    verbose_name = _(
-        "Replacement template to apply to group short name,"
-        "e.g. \\g<class>; separate multiple templates by |"
-    )
+    verbose_name = _("Replacement template to apply to group short name")
+    help_text = _("e.g. \\g<class>; separate multiple templates by |")
+    row = "ldap_group_sync_field_short_name"
 
 
 @site_preferences_registry.register
@@ -84,6 +92,7 @@ class LDAPGroupSyncFieldName(StringPreference):
     default = "cn"
     required = False
     verbose_name = _("Field for name of group")
+    row = "ldap_group_sync_field_name"
 
 
 @site_preferences_registry.register
@@ -92,10 +101,9 @@ class LDAPGroupSyncFieldNameRE(StringPreference):
     name = "group_sync_field_name_re"
     default = ""
     required = False
-    verbose_name = _(
-        "Regular expression to match LDAP value for group name against,"
-        "e.g. class_(?P<class>.*); separate multiple patterns by |"
-    )
+    verbose_name = _("Regular expression to match LDAP value for group name against,")
+    help_text = _("e.g. class_(?P<class>.*); separate multiple patterns by |")
+    row = "ldap_group_sync_field_name"
 
 
 @site_preferences_registry.register
@@ -104,10 +112,9 @@ class LDAPGroupSyncFieldNameReplace(StringPreference):
     name = "group_sync_field_name_replace"
     default = ""
     required = False
-    verbose_name = _(
-        "Replacement template to apply to group name,"
-        "e.g. \\g<class>; separate multiple templates by |"
-    )
+    verbose_name = _("Replacement template to apply to group name")
+    help_text = _("e.g. \\g<class>; separate multiple templates by |")
+    row = "ldap_group_sync_field_name"
 
 
 @site_preferences_registry.register
@@ -117,6 +124,7 @@ class LDAPGroupSyncOwnerAttr(StringPreference):
     default = ""
     required = False
     verbose_name = _("LDAP field with dn of group owner")
+    row = "ldap_group_sync_owner_attr"
 
 
 @site_preferences_registry.register
@@ -130,12 +138,4 @@ class LDAPGroupSyncOwnerAttrType(ChoicePreference):
         ("dn", _("Distinguished Name")),
         ("uid", _("UID")),
     ]
-
-
-@site_preferences_registry.register
-class LDAPPersonSyncOnLogin(BooleanPreference):
-    section = ldap
-    name = "person_sync_on_login"
-    default = True
-    required = False
-    verbose_name = _("Sync LDAP user with person on login")
+    row = "ldap_group_sync_owner_attr"
