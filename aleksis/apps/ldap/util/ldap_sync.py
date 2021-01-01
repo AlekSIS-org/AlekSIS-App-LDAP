@@ -76,9 +76,10 @@ def update_dynamic_preferences():
             class _GeneratedPreference(StringPreference):
                 section = section_ldap
                 name = setting_name
-                verbose_name = _(f"LDAP field for {field.verbose_name} on {model._meta.label}")
+                verbose_name = _(f"LDAP field for '{field.verbose_name}' on {model._meta.label}")
                 required = False
                 default = ""
+                row = setting_name
 
             @site_preferences_registry.register
             class _GeneratedPreferenceRe(StringPreference):
@@ -86,20 +87,23 @@ def update_dynamic_preferences():
                 name = setting_name + "_re"
                 verbose_name = _(
                     f"Regular expression to match LDAP value for"
-                    f" {field.verbose_name} on {model._meta.label} against"
+                    f" '{field.verbose_name}' on {model._meta.verbose_name} against"
                 )
                 required = False
                 default = ""
+                row = setting_name
 
             @site_preferences_registry.register
             class _GeneratedPreferenceReplace(StringPreference):
                 section = section_ldap
                 name = setting_name + "_replace"
                 verbose_name = _(
-                    f"Replacement template to apply to {field.verbose_name} on {model._meta.label}"
+                    f"Replacement template to apply to '{field.verbose_name}'"
+                    f" on {model._meta.verbose_name}"
                 )
                 required = False
                 default = ""
+                row = setting_name
 
     @site_preferences_registry.register
     class LDAPMatchingFields(MultipleChoicePreference):
