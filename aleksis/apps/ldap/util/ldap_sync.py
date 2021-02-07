@@ -167,42 +167,31 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None):
 
 
 @transaction.atomic
-def ldap_sync_user_on_login(sender, instance, created, **kwargs):
+def ldap_sync_user_on_login(sender, user, ldap_user, **kwargs):
     """Synchronise Person meta-data and groups from ldap_user on User update."""
     # Check if sync on login is activated
     if not get_site_preferences()["ldap__person_sync_on_login"]:
         return
 
-    # Semaphore to guard recursive saves within this signal
-    if getattr(instance, "_skip_signal", False):
-        return
-    instance._skip_signal = True
-
     Person = apps.get_model("core", "Person")
 
-    if (
-        get_site_preferences()["ldap__enable_sync"]
-        and (created or get_site_preferences()["ldap__sync_on_update"])
-        and hasattr(instance, "ldap_user")
-    ):
+    if get_site_preferences()["ldap__enable_sync"]:
         try:
             with transaction.atomic():
-                person = ldap_sync_from_user(
-                    instance, instance.ldap_user.dn, instance.ldap_user.attrs.data
-                )
+                person = ldap_sync_from_user(user, ldap_user.dn, ldap_user.attrs.data)
         except Person.DoesNotExist:
-            logger.warn(f"No matching person for user {instance.username}")
+            logger.warn(f"No matching person for user {user.username}")
             return
         except Person.MultipleObjectsReturned:
-            logger.error(f"More than one matching person for user {instance.username}")
+            logger.error(f"More than one matching person for user {user.username}")
             return
         except (DataError, IntegrityError, ValueError) as e:
-            logger.error(f"Data error while synchronising user {instance.username}:\n{e}")
+            logger.error(f"Data error while synchronising user {user.username}:\n{e}")
             return
 
         if get_site_preferences()["ldap__enable_group_sync"]:
             # Get groups from LDAP
-            groups = instance.ldap_user._get_groups()
+            groups = ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
             group_objects = ldap_sync_from_groups(group_infos)
 
@@ -216,9 +205,6 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
             # Exceptions here are logged only because the synchronisation is optional
             # FIXME throw warning to user instead
             logger.error(f"Could not save person {person}:\n{e}")
-
-    # Remove semaphore
-    del instance._skip_signal
 
 
 @transaction.atomic
@@ -329,11 +315,10 @@ def ldap_sync_from_groups(group_infos):
 
         # FIXME FInd a way to throw exceptions correctly but still continue import
         try:
-            with transaction.atomic():
-                group, created = Group.objects.select_related(None).update_or_create(
-                    ldap_dn=ldap_group[0].lower(),
-                    defaults={"short_name": short_name, "name": name},
-                )
+            group, created = Group.objects.select_related(None).update_or_create(
+                ldap_dn=ldap_group[0].lower(),
+                defaults={"short_name": short_name, "name": name},
+            )
         except IntegrityError as e:
             logger.error(f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}")
             continue
@@ -387,21 +372,20 @@ def mass_ldap_import():
         ldap_user._populate_user_from_attributes()
         user.save()
 
-        if created or get_site_preferences()["ldap__sync_on_update"]:
-            try:
-                with transaction.atomic():
-                    person = ldap_sync_from_user(user, dn, attrs)
-            except Person.DoesNotExist:
-                logger.warn(f"No matching person for user {user.username}")
-                continue
-            except Person.MultipleObjectsReturned:
-                logger.error(f"More than one matching person for user {user.username}")
-                continue
-            except (DataError, IntegrityError, KeyError, ValueError) as e:
-                logger.error(f"Data error while synchronising user {user.username}:\n{e}")
-                continue
-            else:
-                logger.info(f"Successfully imported user {uid}")
+        try:
+            with transaction.atomic():
+                person = ldap_sync_from_user(user, dn, attrs)
+        except Person.DoesNotExist:
+            logger.warn(f"No matching person for user {user.username}")
+            continue
+        except Person.MultipleObjectsReturned:
+            logger.error(f"More than one matching person for user {user.username}")
+            continue
+        except (DataError, IntegrityError, KeyError, ValueError) as e:
+            logger.error(f"Data error while synchronising user {user.username}:\n{e}")
+            continue
+        else:
+            logger.info(f"Successfully imported user {uid}")
 
     # Synchronise group memberships now
     if get_site_preferences()["ldap__enable_group_sync"]:
@@ -409,7 +393,7 @@ def mass_ldap_import():
         owner_attr = get_site_preferences()["ldap__group_sync_owner_attr"]
 
         for ldap_group in tqdm(
-            ldap_groups, desc="Sync. group members", total=len(group_objects), **TQDM_DEFAULTS,
+            ldap_groups, desc="Sync. group members", total=len(ldap_groups), **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
 
