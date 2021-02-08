@@ -18,7 +18,7 @@ class LDAPConfig(AppConfig):
     }
     licence = "EUPL-1.2+"
     copyright_info = (
-        ([2020], "Dominik George", "dominik.george@teckids.org"),
+        ([2020, 2021], "Dominik George", "dominik.george@teckids.org"),
         ([2020], "Tom Teichler", "tom.teichler@teckids.org"),
     )
 
