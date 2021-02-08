@@ -139,3 +139,12 @@ class LDAPGroupSyncOwnerAttrType(ChoicePreference):
         ("uid", _("UID")),
     ]
     row = "ldap_group_sync_owner_attr"
+
+
+@site_preferences_registry.register
+class EnableLDAPPasswordChange(BooleanPreference):
+    section = ldap
+    name = "enable_password_change"
+    default = False
+    required = False
+    verbose_name = _("Change LDAP password on AlekSIS password change")
