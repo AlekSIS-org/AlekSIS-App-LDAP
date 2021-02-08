@@ -13,4 +13,5 @@ def ldap_change_password(request, user, **kwargs):
 
     # Get low-level LDAP connection and update password
     conn = user.ldap_user._get_connection()
+    conn.bind_s(user.ldap_user.dn, old)
     conn.passwd_s(user.ldap_user.dn, old, new)
