@@ -1,8 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 
+from allauth.account.signals import password_changed
+
 from aleksis.core.util.apps import AppConfig
 
+from .util.ldap_password import ldap_change_password
 from .util.ldap_sync import ldap_sync_user_on_login, update_dynamic_preferences
 
 
@@ -26,3 +29,4 @@ class LDAPConfig(AppConfig):
 
         User = get_user_model()
         post_save.connect(ldap_sync_user_on_login, sender=User)
+        password_changed.connect(ldap_change_password)
