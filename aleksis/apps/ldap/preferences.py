@@ -148,3 +148,30 @@ class EnableLDAPPasswordChange(BooleanPreference):
     default = False
     required = False
     verbose_name = _("Change LDAP password on AlekSIS password change")
+
+
+@site_preferences_registry.register
+class AdminLDAPPasswordChange(BooleanPreference):
+    section = ldap
+    name = "admin_password_change"
+    default = False
+    required = False
+    verbose_name = _("Use admin account (or auth account if unset) to change passwords")
+
+
+@site_preferences_registry.register
+class LDAPAdminDN(StringPreference):
+    section = ldap
+    name = "admin_dn"
+    default = ""
+    required = False
+    verbose_name = _("DN of LDAP admin account (if other than LDAP auth account)")
+
+
+@site_preferences_registry.register
+class LDAPAdminPassword(StringPreference):
+    section = ldap
+    name = "admin_password"
+    default = ""
+    required = False
+    verbose_name = _("Password of LDAP admin account (if other than LDAP auth account)")
