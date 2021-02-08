@@ -27,3 +27,6 @@ def ldap_change_password(request, user, **kwargs):
         # If not available, try using the regular LDAP auth credentials
         conn.bind_s(admin_dn, admin_password)
     conn.passwd_s(user.ldap_user.dn, old, new)
+
+    # Unbind so we do not leak connections with elevated privileges
+    conn.unbind_s()
