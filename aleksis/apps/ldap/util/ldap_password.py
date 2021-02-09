@@ -24,17 +24,15 @@ def ldap_change_password(request, user, **kwargs):
     old = request.POST.get("oldpassword", None)
     new = request.POST["password1"]
 
-    # Get low-level LDAP connection and update password
-    conn = user.ldap_user._get_connection()
     if old and not admin_password_change:
         # If we are changing a password as user, use their credentials
         # except if the preference mandates always using admin credentials
-        conn.bind_s(user.ldap_user.dn, old)
+        user.ldap_user._bind_as(user.ldap_user.dn, old, sticky=True)
     elif admin_dn:
         # In all other cases, use admin credentials if available
         # If not available, try using the regular LDAP auth credentials
-        conn.bind_s(admin_dn, admin_password)
-    conn.passwd_s(user.ldap_user.dn, old, new)
+        user.ldap_user._bind_as(admin_dn, admin_password, sticky=True)
+    user.ldap_user.connection.passwd_s(user.ldap_user.dn, old, new)
 
-    # Unbind so we do not leak connections with elevated privileges
-    conn.unbind_s()
+    # Re-bind with regular credentials so we do not leak connections with elevated privileges
+    user.ldap_user._bind()
