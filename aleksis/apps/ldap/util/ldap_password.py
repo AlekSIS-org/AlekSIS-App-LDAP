@@ -11,6 +11,14 @@ def ldap_change_password(request, user, **kwargs):
         # Do nothing if password change in LDAP is disabled
         return
 
+    if not hasattr(user, "ldap_user"):
+        # Add ldap_user relation to user if not available yet
+        # This can happen on password reset, when the user is acted upon
+        # but was never logged-in
+        from django_auth_ldap.backend import LDAPBackend, _LDAPUser  # noqa
+
+        user.ldap_user = _LDAPUser(LDAPBackend(), user=user)
+
     # Get old and new password from submitted form
     # We rely on allauth already having validated the form before emitting the signal
     old = request.POST.get("oldpassword", None)
