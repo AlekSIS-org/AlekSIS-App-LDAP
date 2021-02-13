@@ -279,8 +279,8 @@ def ldap_sync_from_groups(group_infos):
     Group = apps.get_model("core", "Group")
 
     # Resolve Group objects from LDAP group objects
-    group_objects = []
-    for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
+    ldap_groups = {}
+    for ldap_group in tqdm(group_infos, desc="Parsing group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
         sync_field_short_name = get_site_preferences()["ldap__group_sync_field_short_name"]
@@ -313,23 +313,43 @@ def ldap_sync_from_groups(group_infos):
         short_name = short_name[: Group._meta.get_field("short_name").max_length]
         name = name[: Group._meta.get_field("name").max_length]
 
-        # FIXME FInd a way to throw exceptions correctly but still continue import
-        try:
-            group, created = Group.objects.select_related(None).update_or_create(
-                ldap_dn=ldap_group[0].lower(),
-                defaults={"short_name": short_name, "name": name},
+        ldap_groups[ldap_group[0].lower()] = {"short_name": short_name, "name": name}
+
+    all_dns = set(ldap_groups.keys())
+
+    # First, update all existing groups with known DNs
+    existing = Group.objects.filter(ldap_dn__in=all_dns).select_related(None)
+    existing_dns = set(existing.values_list("ldap_dn", flat=True))
+    for obj in existing:
+        obj.name = ldap_groups[obj.ldap_dn]["name"]
+        obj.short_name = ldap_groups[obj.ldap_dn]["short_name"]
+    logger.info(f"Updating {len(existing)} Django groups")
+    try:
+        Group.objects.bulk_update(existing, ("name", "short_name"))
+    except IntegrityError as e:
+        logger.error(f"Integrity error while trying to import LDAP groups:\n{e}")
+    else:
+        logger.debug(f"Updated {len(existing)} Django groups")
+
+    # Second, create all groups with unknown DNs
+    nonexisting_dns = all_dns - existing_dns
+    nonexisting = []
+    for dn in nonexisting_dns:
+        nonexisting.append(
+            Group(
+                ldap_dn=dn, name=ldap_groups[dn]["name"], short_name=ldap_groups[dn]["short_name"]
             )
-        except IntegrityError as e:
-            logger.error(f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}")
-            continue
-        else:
-            status = "Created" if created else "Updated"
-            value = ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0]
-            logger.info(f"{status} LDAP group {value} for Django group {name}")
+        )
+    logger.info(f"Creating {len(nonexisting)} Django groups")
+    try:
+        Group.objects.bulk_create(nonexisting)
+    except IntegrityError as e:
+        logger.error(f"Integrity error while trying to import LDAP groups:\n{e}")
+    else:
+        logger.debug(f"Created {len(nonexisting)} Django groups")
 
-        group_objects.append(group)
-
-    return group_objects
+    # Return all groups ever touched
+    return set(existing) | set(nonexisting)
 
 
 @transaction.atomic
