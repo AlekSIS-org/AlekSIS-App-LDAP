@@ -444,8 +444,9 @@ def mass_ldap_import():
             logger.info(f"Set group members of group {group}")
 
     # Synchronise primary groups
-    for person in tqdm(Person.objects.all(), desc="Sync. primary groups", **TQDM_DEFAULTS):
+    all_persons = set(Person.objects.all())
+    for person in tqdm(all_persons, desc="Sync. primary groups", **TQDM_DEFAULTS):
         person.auto_select_primary_group()
-        person.save()
+    Person.objects.bulk_update(all_persons, ("primary_group",))
 
     logger.info("Commiting transaction; this can take some time.")
