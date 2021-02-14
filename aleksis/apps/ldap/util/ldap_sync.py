@@ -319,7 +319,7 @@ def ldap_sync_from_groups(group_infos):
 
     # First, update all existing groups with known DNs
     existing = Group.objects.filter(ldap_dn__in=all_dns).select_related(None)
-    existing_dns = set(existing.values_list("ldap_dn", flat=True))
+    existing_dns = set([v.ldap_dn for v in existing])
     for obj in existing:
         obj.name = ldap_groups[obj.ldap_dn]["name"]
         obj.short_name = ldap_groups[obj.ldap_dn]["short_name"]
