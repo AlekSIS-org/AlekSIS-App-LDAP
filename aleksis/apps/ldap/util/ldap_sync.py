@@ -167,42 +167,31 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None):
 
 
 @transaction.atomic
-def ldap_sync_user_on_login(sender, instance, created, **kwargs):
+def ldap_sync_user_on_login(sender, user, ldap_user, **kwargs):
     """Synchronise Person meta-data and groups from ldap_user on User update."""
     # Check if sync on login is activated
     if not get_site_preferences()["ldap__person_sync_on_login"]:
         return
 
-    # Semaphore to guard recursive saves within this signal
-    if getattr(instance, "_skip_signal", False):
-        return
-    instance._skip_signal = True
-
     Person = apps.get_model("core", "Person")
 
-    if (
-        get_site_preferences()["ldap__enable_sync"]
-        and (created or get_site_preferences()["ldap__sync_on_update"])
-        and hasattr(instance, "ldap_user")
-    ):
+    if get_site_preferences()["ldap__enable_sync"]:
         try:
             with transaction.atomic():
-                person = ldap_sync_from_user(
-                    instance, instance.ldap_user.dn, instance.ldap_user.attrs.data
-                )
+                person = ldap_sync_from_user(user, ldap_user.dn, ldap_user.attrs.data)
         except Person.DoesNotExist:
-            logger.warn(f"No matching person for user {instance.username}")
+            logger.warn(f"No matching person for user {user.username}")
             return
         except Person.MultipleObjectsReturned:
-            logger.error(f"More than one matching person for user {instance.username}")
+            logger.error(f"More than one matching person for user {user.username}")
             return
         except (DataError, IntegrityError, ValueError) as e:
-            logger.error(f"Data error while synchronising user {instance.username}:\n{e}")
+            logger.error(f"Data error while synchronising user {user.username}:\n{e}")
             return
 
         if get_site_preferences()["ldap__enable_group_sync"]:
             # Get groups from LDAP
-            groups = instance.ldap_user._get_groups()
+            groups = ldap_user._get_groups()
             group_infos = list(groups._get_group_infos())
             group_objects = ldap_sync_from_groups(group_infos)
 
@@ -216,9 +205,6 @@ def ldap_sync_user_on_login(sender, instance, created, **kwargs):
             # Exceptions here are logged only because the synchronisation is optional
             # FIXME throw warning to user instead
             logger.error(f"Could not save person {person}:\n{e}")
-
-    # Remove semaphore
-    del instance._skip_signal
 
 
 @transaction.atomic
@@ -293,8 +279,8 @@ def ldap_sync_from_groups(group_infos):
     Group = apps.get_model("core", "Group")
 
     # Resolve Group objects from LDAP group objects
-    group_objects = []
-    for ldap_group in tqdm(group_infos, desc="Sync. group infos", **TQDM_DEFAULTS):
+    ldap_groups = {}
+    for ldap_group in tqdm(group_infos, desc="Parsing group infos", **TQDM_DEFAULTS):
         # Skip group if one of the name fields is missing
         # FIXME Throw exceptions and catch outside
         sync_field_short_name = get_site_preferences()["ldap__group_sync_field_short_name"]
@@ -327,24 +313,43 @@ def ldap_sync_from_groups(group_infos):
         short_name = short_name[: Group._meta.get_field("short_name").max_length]
         name = name[: Group._meta.get_field("name").max_length]
 
-        # FIXME FInd a way to throw exceptions correctly but still continue import
-        try:
-            with transaction.atomic():
-                group, created = Group.objects.select_related(None).update_or_create(
-                    ldap_dn=ldap_group[0].lower(),
-                    defaults={"short_name": short_name, "name": name},
-                )
-        except IntegrityError as e:
-            logger.error(f"Integrity error while trying to import LDAP group {ldap_group[0]}:\n{e}")
-            continue
-        else:
-            status = "Created" if created else "Updated"
-            value = ldap_group[1][get_site_preferences()["ldap__group_sync_field_name"]][0]
-            logger.info(f"{status} LDAP group {value} for Django group {name}")
+        ldap_groups[ldap_group[0].lower()] = {"short_name": short_name, "name": name}
 
-        group_objects.append(group)
+    all_dns = set(ldap_groups.keys())
 
-    return group_objects
+    # First, update all existing groups with known DNs
+    existing = Group.objects.filter(ldap_dn__in=all_dns).select_related(None)
+    existing_dns = set([v.ldap_dn for v in existing])
+    for obj in existing:
+        obj.name = ldap_groups[obj.ldap_dn]["name"]
+        obj.short_name = ldap_groups[obj.ldap_dn]["short_name"]
+    logger.info(f"Updating {len(existing)} Django groups")
+    try:
+        Group.objects.bulk_update(existing, ("name", "short_name"))
+    except IntegrityError as e:
+        logger.error(f"Integrity error while trying to import LDAP groups:\n{e}")
+    else:
+        logger.debug(f"Updated {len(existing)} Django groups")
+
+    # Second, create all groups with unknown DNs
+    nonexisting_dns = all_dns - existing_dns
+    nonexisting = []
+    for dn in nonexisting_dns:
+        nonexisting.append(
+            Group(
+                ldap_dn=dn, name=ldap_groups[dn]["name"], short_name=ldap_groups[dn]["short_name"]
+            )
+        )
+    logger.info(f"Creating {len(nonexisting)} Django groups")
+    try:
+        Group.objects.bulk_create(nonexisting)
+    except IntegrityError as e:
+        logger.error(f"Integrity error while trying to import LDAP groups:\n{e}")
+    else:
+        logger.debug(f"Created {len(nonexisting)} Django groups")
+
+    # Return all groups ever touched
+    return set(existing) | set(nonexisting)
 
 
 @transaction.atomic
@@ -387,21 +392,20 @@ def mass_ldap_import():
         ldap_user._populate_user_from_attributes()
         user.save()
 
-        if created or get_site_preferences()["ldap__sync_on_update"]:
-            try:
-                with transaction.atomic():
-                    person = ldap_sync_from_user(user, dn, attrs)
-            except Person.DoesNotExist:
-                logger.warn(f"No matching person for user {user.username}")
-                continue
-            except Person.MultipleObjectsReturned:
-                logger.error(f"More than one matching person for user {user.username}")
-                continue
-            except (DataError, IntegrityError, KeyError, ValueError) as e:
-                logger.error(f"Data error while synchronising user {user.username}:\n{e}")
-                continue
-            else:
-                logger.info(f"Successfully imported user {uid}")
+        try:
+            with transaction.atomic():
+                person = ldap_sync_from_user(user, dn, attrs)
+        except Person.DoesNotExist:
+            logger.warn(f"No matching person for user {user.username}")
+            continue
+        except Person.MultipleObjectsReturned:
+            logger.error(f"More than one matching person for user {user.username}")
+            continue
+        except (DataError, IntegrityError, KeyError, ValueError) as e:
+            logger.error(f"Data error while synchronising user {user.username}:\n{e}")
+            continue
+        else:
+            logger.info(f"Successfully imported user {uid}")
 
     # Synchronise group memberships now
     if get_site_preferences()["ldap__enable_group_sync"]:
@@ -409,7 +413,7 @@ def mass_ldap_import():
         owner_attr = get_site_preferences()["ldap__group_sync_owner_attr"]
 
         for ldap_group in tqdm(
-            ldap_groups, desc="Sync. group members", total=len(group_objects), **TQDM_DEFAULTS,
+            ldap_groups, desc="Sync. group members", total=len(ldap_groups), **TQDM_DEFAULTS,
         ):
             dn, attrs = ldap_group
 
@@ -440,8 +444,9 @@ def mass_ldap_import():
             logger.info(f"Set group members of group {group}")
 
     # Synchronise primary groups
-    for person in tqdm(Person.objects.all(), desc="Sync. primary groups", **TQDM_DEFAULTS):
+    all_persons = set(Person.objects.all())
+    for person in tqdm(all_persons, desc="Sync. primary groups", **TQDM_DEFAULTS):
         person.auto_select_primary_group()
-        person.save()
+    Person.objects.bulk_update(all_persons, ("primary_group",))
 
     logger.info("Commiting transaction; this can take some time.")

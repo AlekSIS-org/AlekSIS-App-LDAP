@@ -18,15 +18,6 @@ class EnableLDAPSync(BooleanPreference):
 
 
 @site_preferences_registry.register
-class LDAPSyncOnUpdate(BooleanPreference):
-    section = ldap
-    name = "sync_on_update"
-    default = True
-    required = False
-    verbose_name = _("Also sync LDAP if user updates")
-
-
-@site_preferences_registry.register
 class LDAPSyncCreateMissingPersons(BooleanPreference):
     section = ldap
     name = "create_missing_persons"

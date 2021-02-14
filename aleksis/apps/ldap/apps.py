@@ -1,6 +1,3 @@
-from django.contrib.auth import get_user_model
-from django.db.models.signals import post_save
-
 from aleksis.core.util.apps import AppConfig
 
 from .util.ldap_sync import ldap_sync_user_on_login, update_dynamic_preferences
@@ -24,5 +21,6 @@ class LDAPConfig(AppConfig):
 
         update_dynamic_preferences()
 
-        User = get_user_model()
-        post_save.connect(ldap_sync_user_on_login, sender=User)
+        from django_auth_ldap.backend import populate_user  # noqa
+
+        populate_user.connect(ldap_sync_user_on_login)
