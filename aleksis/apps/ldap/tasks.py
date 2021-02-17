@@ -1,8 +1,8 @@
-from aleksis.core.util.core_helpers import celery_optional
+from aleksis.core.celery import app
 
 from .util.ldap_sync import mass_ldap_import
 
 
-@celery_optional
+@app.task
 def ldap_import():
     mass_ldap_import()
