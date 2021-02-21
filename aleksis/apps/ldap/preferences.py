@@ -36,6 +36,23 @@ class LDAPPersonSyncOnLogin(BooleanPreference):
 
 
 @site_preferences_registry.register
+class LDAPUserCreateOnRegister(BooleanPreference):
+    section = ldap
+    name = "user_create_on_register"
+    default = True
+    required = False
+    verbose_name = _("Create LDAP user on registration")
+
+
+class LDAPUserCreateRDNFields(StringPreference):
+    section = ldap
+    name = "user_create_rdn_fields"
+    default = "uid"
+    required = False
+    verbose_name = _("Comma-separated list of RDN fields for new user entries")
+
+
+@site_preferences_registry.register
 class EnableLDAPGroupSync(BooleanPreference):
     section = ldap
     name = "enable_group_sync"

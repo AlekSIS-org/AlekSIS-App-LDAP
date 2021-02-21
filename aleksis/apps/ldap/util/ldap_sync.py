@@ -3,6 +3,7 @@ import logging
 import re
 
 from django.apps import apps
+from django.conf import settings
 from django.core.files import File
 from django.db import DataError, IntegrityError, transaction
 from django.db.models import fields
@@ -164,6 +165,23 @@ def get_ldap_value_for_field(model, field, attrs, dn, instance=None):
         return value
     else:
         raise KeyError(f"Field {ldap_field} not in attributes of {dn}")
+
+
+@transaction.atomic
+def ldap_create_user(sender, request, user, **kwargs):
+    """Create a user in LDAP upon registration through allauth."""
+    # Check if creation on registration is activated
+    if not get_site_preferences()["ldap__user_create_on_register"]:
+        return
+
+    # Build attributes
+    attrs = {attr: getattr(user, field) for field, attr in settings.AUTH_LDAP_USER_ATTR_MAP.items()}
+    
+    # Build DN for new object
+    rdn_fields = get_site_preferences()["ldap__user_create_rdn_fields"]
+    base_dn = settings.AUTH_LDAP_USER_SEARCH.base_dn
+    rdn = "+".join([f"{rdn_field}={attrs[rdn_field][0]}" for rdn_field in rdn_fields])
+    dn = f"{rdn},{base_dn}"
 
 
 @transaction.atomic
