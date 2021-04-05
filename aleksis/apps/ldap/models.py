@@ -84,10 +84,8 @@ class PersonPosixAttrs(ExtensibleModel):
     username = models.CharField(
         verbose_name=_("Username"),
         unique=True,
-        validators=[
-            validate_username_allowed,
-        ],
-        max_length=32
+        validators=[validate_username_allowed,],
+        max_length=32,
     )
 
     def clean_username(self) -> None:
