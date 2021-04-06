@@ -19,8 +19,8 @@ Licence
 
 ::
 
+  Copyright © 2020, 2021 Dominik George <dominik.george@teckids.org>
   Copyright © 2020 Tom Teichler <tom.teichler@teckids.org>
-  Copyright © 2020 Dominik George <dominik.george@teckids.org>
 
   Licenced under the EUPL, version 1.2 or later
 
