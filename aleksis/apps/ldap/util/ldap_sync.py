@@ -55,7 +55,10 @@ def from_ldap(value, field, dn, ldap_field, instance=None):
         content = File(io.BytesIO(value))
 
         basename = ldap_field_to_filename(dn, ldap_field)
-        extension = Magic(extension=True).from_buffer(content).split("/")[0]
+        if ldap_field == "jpegphoto":
+            extension = "jpeg"
+        else:
+            extension = Magic(extension=True).from_buffer(content).split("/")[0]
         name = f"{basename}.{extension}"
 
         # Pre-save field file instance
