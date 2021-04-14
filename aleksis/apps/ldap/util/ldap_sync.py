@@ -11,6 +11,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 from dynamic_preferences.types import MultipleChoicePreference, StringPreference
+from magic import Magic
 from tqdm import tqdm
 
 from aleksis.core.registries import site_preferences_registry
@@ -51,8 +52,14 @@ def from_ldap(value, field, dn, ldap_field, instance=None):
         # Be opportunistic, but keep old value if conversion fails
         value = datetime_from_ldap(value) or value
     elif isinstance(field, FileField) and instance is not None:
-        name = ldap_field_to_filename(dn, ldap_field)
         content = File(io.BytesIO(value))
+
+        basename = ldap_field_to_filename(dn, ldap_field)
+        if ldap_field == "jpegphoto":
+            extension = "jpeg"
+        else:
+            extension = Magic(extension=True).from_buffer(content).split("/")[0]
+        name = f"{basename}.{extension}"
 
         # Pre-save field file instance
         fieldfile = getattr(instance, field.attname)
