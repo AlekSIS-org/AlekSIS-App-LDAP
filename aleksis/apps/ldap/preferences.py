@@ -12,7 +12,7 @@ from dynamic_preferences.types import (
 from aleksis.core.registries import site_preferences_registry
 
 ldap = Section("ldap")
-posix = Section("posix", verbose_name=_("POSIX"))
+posix = Section("posix")
 
 
 @site_preferences_registry.register
