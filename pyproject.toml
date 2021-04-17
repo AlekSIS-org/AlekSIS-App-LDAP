@@ -33,7 +33,9 @@ secondary = true
 python = "^3.7"
 django-ldapdb = "^1.4.0"
 tqdm = "^4.44.1"
-aleksis-core = {version = "^2.0a3.dev0", extras = ["ldap"]}
+sshpubkeys = "^3.1.0"
+aleksis-core = {version = "^2.0a5.dev0", extras = ["ldap"]}
+python-magic = "^0.4.22"
 
 [tool.poetry.dev-dependencies]
 aleksis-builddeps = "*"
