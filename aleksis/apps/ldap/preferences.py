@@ -1,18 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 
 from dynamic_preferences.preferences import Section
-from dynamic_preferences.types import (
-    BooleanPreference,
-    ChoicePreference,
-    IntegerPreference,
-    LongStringPreference,
-    StringPreference,
-)
+from dynamic_preferences.types import BooleanPreference, ChoicePreference, StringPreference
 
 from aleksis.core.registries import site_preferences_registry
 
 ldap = Section("ldap")
-posix = Section("posix")
 
 
 @site_preferences_registry.register
@@ -137,62 +130,3 @@ class LDAPGroupSyncOwnerAttrType(ChoicePreference):
         ("uid", _("UID")),
     ]
     row = "ldap_group_sync_owner_attr"
-
-
-@site_preferences_registry.register
-class DefaultShell(StringPreference):
-    section = posix
-    name = "shell"
-    default = "/bin/bash"
-    required = False
-    verbose_name = _("Default login shell")
-
-
-@site_preferences_registry.register
-class DefaultPrimaryGid(IntegerPreference):
-    section = posix
-    name = "gid"
-    default = 100
-    required = False
-    verbose_name = _("Default primary GID number")
-
-
-@site_preferences_registry.register
-class MinGidNumber(IntegerPreference):
-    section = posix
-    name = "min_gid"
-    default = 1000
-    required = False
-    verbose_name = _("Minimal GID number")
-
-
-@site_preferences_registry.register
-class MinUidNumber(IntegerPreference):
-    section = posix
-    name = "min_uid"
-    default = 1000
-    required = False
-    verbose_name = _("Minimum UID number")
-
-
-@site_preferences_registry.register
-class UIDRegex(StringPreference):
-    section = posix
-    name = "uid_regex"
-    default = "^[A-Za-z0-9_.][A-Za-z0-9_.-]*$"
-    required = False
-    verbose_name = _("Regex match for usernames")
-
-
-@site_preferences_registry.register
-class DisallowedUids(LongStringPreference):
-    section = posix
-    name = "disallowed_uids"
-    default = (
-        "bin,daemon,Debian-exim,freerad,games,gnats,irc,list,lp,mail,man,messagebus,news,"
-        "nslcd,ntp,openldap,postfix,postgres,proxy,root,sshd,sssd,statd,sync,sys,systemd-bus-proxy,"
-        "systemd-network,systemd-resolve,systemd-timesync,uucp,www-data,"
-        "webmaster,hostmaster,postmaster"
-    )
-    required = False
-    verbose_name = _("Comma-seperated list of disallowed usernames")
