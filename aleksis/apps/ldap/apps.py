@@ -31,4 +31,5 @@ class LDAPConfig(AppConfig):
         user_signed_up.connect(ldap_create_user)
 
         from django_auth_ldap.backend import populate_user  # noqa
+
         populate_user.connect(ldap_sync_user_on_login)

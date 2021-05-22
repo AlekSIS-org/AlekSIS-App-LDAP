@@ -2,6 +2,7 @@ from aleksis.core.util.core_helpers import get_site_preferences
 
 from .ldap import TemporaryBind
 
+
 def ldap_change_password(request, user, **kwargs):
     enable_password_change = get_site_preferences()["ldap__enable_password_change"]
     admin_password_change = get_site_preferences()["ldap__admin_password_change"]

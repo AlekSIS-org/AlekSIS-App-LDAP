@@ -183,7 +183,7 @@ def ldap_create_user(sender, request, user, **kwargs):
 
     # Build attributes
     attrs = {attr: getattr(user, field) for field, attr in settings.AUTH_LDAP_USER_ATTR_MAP.items()}
-    
+
     # Build DN for new object
     rdn_fields = get_site_preferences()["ldap__user_create_rdn_fields"]
     base_dn = settings.AUTH_LDAP_USER_SEARCH.base_dn

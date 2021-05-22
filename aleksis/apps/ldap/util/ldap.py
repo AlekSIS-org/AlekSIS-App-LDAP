@@ -1,4 +1,4 @@
-"""Extension utilities for django-auth-ldap"""
+"""Extension utilities for django-auth-ldap."""
 
 import logging
 
@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 class TemporaryBind:
-    """LDAP conection from an LDAPUser object temporarily bound with other credentials"""
+    """LDAP conection from an LDAPUser object temporarily bound with other credentials."""
 
     def __init__(self, ldap_user, bind_dn, password):
         self.ldap_user = ldap_user
@@ -20,8 +20,9 @@ class TemporaryBind:
             self.ldap_user._bind_as(self.bind_dn, self.password, sticky=True)
         return self.ldap_user.connection
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type_, value, traceback):
         if self.bind_dn is not None:
-            # Re-bind with regular credentials so we do not leak connections with elevated privileges
+            # Re-bind with regular credentials
+            # so we do not leak connections with elevated privileges
             logger.info("Ending temporary LDAP bind as %s", self.bind_dn)
             self.ldap_user._bind()
