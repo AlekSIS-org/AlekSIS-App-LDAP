@@ -1,18 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 
 from dynamic_preferences.preferences import Section
-from dynamic_preferences.types import (
-    BooleanPreference,
-    ChoicePreference,
-    IntegerPreference,
-    LongStringPreference,
-    StringPreference,
-)
+from dynamic_preferences.types import BooleanPreference, ChoicePreference, StringPreference
 
 from aleksis.core.registries import site_preferences_registry
 
 ldap = Section("ldap")
-posix = Section("posix", verbose_name=_("POSIX"))
 
 
 @site_preferences_registry.register

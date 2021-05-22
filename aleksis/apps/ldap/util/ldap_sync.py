@@ -302,6 +302,10 @@ def ldap_sync_from_user(user, dn, attrs):
 def ldap_sync_from_groups(group_infos):
     """Synchronise group information from LDAP results to Django."""
     Group = apps.get_model("core", "Group")
+    SchoolTerm = apps.get_model("core", "SchoolTerm")
+
+    # Get current school term
+    school_term = SchoolTerm.current
 
     # Resolve Group objects from LDAP group objects
     ldap_groups = {}
@@ -343,7 +347,9 @@ def ldap_sync_from_groups(group_infos):
     all_dns = set(ldap_groups.keys())
 
     # First, update all existing groups with known DNs
-    existing = Group.objects.filter(ldap_dn__in=all_dns).select_related(None)
+    existing = Group.objects.filter(ldap_dn__in=all_dns, school_term=school_term).select_related(
+        None
+    )
     existing_dns = set([v.ldap_dn for v in existing])
     for obj in existing:
         obj.name = ldap_groups[obj.ldap_dn]["name"]
@@ -362,7 +368,10 @@ def ldap_sync_from_groups(group_infos):
     for dn in nonexisting_dns:
         nonexisting.append(
             Group(
-                ldap_dn=dn, name=ldap_groups[dn]["name"], short_name=ldap_groups[dn]["short_name"]
+                ldap_dn=dn,
+                name=ldap_groups[dn]["name"],
+                short_name=ldap_groups[dn]["short_name"],
+                school_term=school_term,
             )
         )
     logger.info(f"Creating {len(nonexisting)} Django groups")
