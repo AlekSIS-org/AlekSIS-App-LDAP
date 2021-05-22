@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AlekSIS-App-LDAP"
-version = "2.0a3.dev0"
+version = "2.0b0"
 packages = [
     { include = "aleksis" }
 ]
@@ -30,11 +30,11 @@ url = "https://edugit.org/api/v4/projects/461/packages/pypi/simple"
 secondary = true
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 django-ldapdb = "^1.4.0"
 tqdm = "^4.44.1"
 sshpubkeys = "^3.1.0"
-aleksis-core = {version = "^2.0a5.dev0", extras = ["ldap"]}
+aleksis-core = {version = "^2.0b0", extras = ["ldap"]}
 python-magic = "^0.4.22"
 
 [tool.poetry.dev-dependencies]
