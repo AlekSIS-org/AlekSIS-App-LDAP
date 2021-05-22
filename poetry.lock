@@ -49,7 +49,7 @@ reference = "gitlab"
 
 [[package]]
 name = "aleksis-core"
-version = "2.1.dev0+20210521221933.799694da"
+version = "2.0b0"
 description = "AlekSIS (School Information System) — Core"
 category = "main"
 optional = false
@@ -2725,7 +2725,7 @@ pycryptodome = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "66496432e5bc38d9ee36c892dbe42c3a8cfc93a2f0d60a01597fb8b648174947"
+content-hash = "39a4a71300086e64dd824a7052f08a2a1b27b0f4c7ed28437e2823dd67a70d19"
 
 [metadata.files]
 alabaster = [
@@ -2737,8 +2737,8 @@ aleksis-builddeps = [
     {file = "AlekSIS_Builddeps-4-py3-none-any.whl", hash = "sha256:02a93e503f5810e6c93a8bc829bc8cbda735ccbf78b91954d2f6507dfea3d01f"},
 ]
 aleksis-core = [
-    {file = "AlekSIS-Core-2.1.dev0+20210521221933.799694da.tar.gz", hash = "sha256:6854c87144ff7fe2b0a23bacedbb30b50e3d2c45acfaedf845c300eb7ca0ea4c"},
-    {file = "AlekSIS_Core-2.1.dev0+20210521221933.799694da-py3-none-any.whl", hash = "sha256:1991d77cb2739fe46b9f437b252ba491e9872ad622c528cc7a9950fff3cd6ea3"},
+    {file = "AlekSIS-Core-2.0b0.tar.gz", hash = "sha256:7847fee66fa9c5e9f72a768716ffb9aa4d3cbce0fd9c4e99de63ea968ca23f7b"},
+    {file = "AlekSIS_Core-2.0b0-py3-none-any.whl", hash = "sha256:cc5075da5e73b7e24d674ba72836fda219d8b3fee25a35804ad8fcad181d892b"},
 ]
 amqp = [
     {file = "amqp-5.0.6-py3-none-any.whl", hash = "sha256:493a2ac6788ce270a2f6a765b017299f60c1998f5a8617908ee9be082f7300fb"},
