@@ -36,6 +36,23 @@ class LDAPPersonSyncOnLogin(BooleanPreference):
 
 
 @site_preferences_registry.register
+class LDAPUserCreateOnRegister(BooleanPreference):
+    section = ldap
+    name = "user_create_on_register"
+    default = True
+    required = False
+    verbose_name = _("Create LDAP user on registration")
+
+
+class LDAPUserCreateRDNFields(StringPreference):
+    section = ldap
+    name = "user_create_rdn_fields"
+    default = "uid"
+    required = False
+    verbose_name = _("Comma-separated list of RDN fields for new user entries")
+
+
+@site_preferences_registry.register
 class EnableLDAPGroupSync(BooleanPreference):
     section = ldap
     name = "enable_group_sync"
@@ -130,3 +147,39 @@ class LDAPGroupSyncOwnerAttrType(ChoicePreference):
         ("uid", _("UID")),
     ]
     row = "ldap_group_sync_owner_attr"
+
+
+@site_preferences_registry.register
+class EnableLDAPPasswordChange(BooleanPreference):
+    section = ldap
+    name = "enable_password_change"
+    default = False
+    required = False
+    verbose_name = _("Change LDAP password on AlekSIS password change")
+
+
+@site_preferences_registry.register
+class AdminLDAPPasswordChange(BooleanPreference):
+    section = ldap
+    name = "admin_password_change"
+    default = False
+    required = False
+    verbose_name = _("Use admin account (or auth account if unset) to change passwords")
+
+
+@site_preferences_registry.register
+class LDAPAdminDN(StringPreference):
+    section = ldap
+    name = "admin_dn"
+    default = ""
+    required = False
+    verbose_name = _("DN of LDAP admin account (if other than LDAP auth account)")
+
+
+@site_preferences_registry.register
+class LDAPAdminPassword(StringPreference):
+    section = ldap
+    name = "admin_password"
+    default = ""
+    required = False
+    verbose_name = _("Password of LDAP admin account (if other than LDAP auth account)")
