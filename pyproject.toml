@@ -5,7 +5,7 @@ packages = [
     { include = "aleksis" }
 ]
 readme = "README.rst"
-include = ["CHANGELOG.rst", "LICENCE.rst", "aleksis/**/locale/*.mo"]
+include = ["CHANGELOG.rst", "LICENCE.rst", "aleksis/**/*.mo"]
 
 description = "AlekSIS (School Information System) — App LDAP (General LDAP import/export)"
 authors = ["Tom Teichler <tom.teichler@teckids.org>", "Dominik George <dominik.george@teckids.org>"]
