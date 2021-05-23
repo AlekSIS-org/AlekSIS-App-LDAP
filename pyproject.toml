@@ -5,7 +5,7 @@ packages = [
     { include = "aleksis" }
 ]
 readme = "README.rst"
-include = ["CHANGELOG.rst", "LICENCE.rst", "aleksis/**/locale/*.mo"]
+include = ["CHANGELOG.rst", "LICENCE.rst", "aleksis/**/*.mo"]
 
 description = "AlekSIS (School Information System) — App LDAP (General LDAP import/export)"
 authors = ["Tom Teichler <tom.teichler@teckids.org>", "Dominik George <dominik.george@teckids.org>"]
@@ -16,7 +16,7 @@ repository = "https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP"
 documentation = "https://aleksis.org/AlekSIS/docs/html/"
 keywords = ["SIS", "education", "school", "ldap", "users"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Web Environment",
     "Framework :: Django :: 3.0",
     "Intended Audience :: Education",
@@ -34,7 +34,7 @@ python = "^3.9"
 django-ldapdb = "^1.4.0"
 tqdm = "^4.44.1"
 sshpubkeys = "^3.1.0"
-aleksis-core = {version = "^2.0b0", extras = ["ldap"]}
+aleksis-core = {version = "2.0b0", extras = ["ldap"]}
 python-magic = "^0.4.22"
 
 [tool.poetry.dev-dependencies]
