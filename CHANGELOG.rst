@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Changed
+~~~~~~~
+
+* Add verbose name for preference section.
+
+Fixed
+~~~~~
+
+* Preferences were evaluated before the app was ready.
+
 `2.0b0`_ - 2021-05-21
 ---------------------
 

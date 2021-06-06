@@ -18,8 +18,6 @@ from tqdm import tqdm
 from aleksis.core.registries import site_preferences_registry
 from aleksis.core.util.core_helpers import get_site_preferences
 
-from ..preferences import ldap as section_ldap
-
 logger = logging.getLogger(__name__)
 
 TQDM_DEFAULTS = {
@@ -74,6 +72,8 @@ def from_ldap(value, field, dn, ldap_field, instance=None):
 
 def update_dynamic_preferences():
     """Auto-generate sync field settings from models."""
+    from ..preferences import ldap as section_ldap  # noqa
+
     Person = apps.get_model("core", "Person")
     for model in (Person,):
         # Collect fields that are matchable
