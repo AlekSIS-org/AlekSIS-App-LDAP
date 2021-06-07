@@ -5,7 +5,7 @@ from dynamic_preferences.types import BooleanPreference, ChoicePreference, Strin
 
 from aleksis.core.registries import site_preferences_registry
 
-ldap = Section("ldap")
+ldap = Section("ldap", verbose_name=_("LDAP"))
 
 
 @site_preferences_registry.register
