@@ -8,9 +8,10 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-06-08 16:49+0200\n"
-"PO-Revision-Date: 2021-05-22 13:19+0000\n"
+"PO-Revision-Date: 2021-06-12 10:39+0000\n"
 "Last-Translator: Jonathan Weth <teckids@jonathanweth.de>\n"
-"Language-Team: German <https://translate.edugit.org/projects/aleksis/aleksis-app-ldap/de/>\n"
+"Language-Team: German <https://translate.edugit.org/projects/aleksis/"
+"aleksis-app-ldap/de/>\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,7 +26,7 @@ msgstr "LDAP Distinguished Name (DN)"
 
 #: aleksis/apps/ldap/preferences.py:8
 msgid "LDAP"
-msgstr ""
+msgstr "LDAP"
 
 #: aleksis/apps/ldap/preferences.py:17
 msgid "Enable LDAP sync"
@@ -33,19 +34,19 @@ msgstr "LDAP-Synchronisation aktivieren"
 
 #: aleksis/apps/ldap/preferences.py:26
 msgid "Create missing persons for LDAP users"
-msgstr "Fehlende Personen für LDAP-Nutzer erstellen"
+msgstr "Fehlende Personen für LDAP-Benutzer erstellen"
 
 #: aleksis/apps/ldap/preferences.py:35
 msgid "Sync LDAP user with person on login"
-msgstr "LDAP-Nutzer bei der Anmeldung synchronisieren"
+msgstr "LDAP-Benutzer bei der Anmeldung synchronisieren"
 
 #: aleksis/apps/ldap/preferences.py:44
 msgid "Create LDAP user on registration"
-msgstr ""
+msgstr "LDAP-Benutzer bei der Registrierung erstellen"
 
 #: aleksis/apps/ldap/preferences.py:52
 msgid "Comma-separated list of RDN fields for new user entries"
-msgstr ""
+msgstr "Komma-separierte Liste von RDN-Felder für neue Benutzereinträge"
 
 #: aleksis/apps/ldap/preferences.py:61
 msgid "Enable ldap group sync"
@@ -101,19 +102,21 @@ msgstr "UID"
 
 #: aleksis/apps/ldap/preferences.py:158
 msgid "Change LDAP password on AlekSIS password change"
-msgstr ""
+msgstr "LDAP-Passwort bei AlekSIS-Passwortänderung ändern"
 
 #: aleksis/apps/ldap/preferences.py:167
 msgid "Use admin account (or auth account if unset) to change passwords"
 msgstr ""
+"Admin-Konto (oder Auth-Konto, wenn nicht gesetzt) nutzen, um Passwörter zu "
+"ändern"
 
 #: aleksis/apps/ldap/preferences.py:176
 msgid "DN of LDAP admin account (if other than LDAP auth account)"
-msgstr ""
+msgstr "DN des LDAP-Admin-Kontos (wenn verschieden zu LDAP-Auth-Konto)"
 
 #: aleksis/apps/ldap/preferences.py:185
 msgid "Password of LDAP admin account (if other than LDAP auth account)"
-msgstr ""
+msgstr "Passwort des LDAP-Admin-Konto (wenn verschieden zu LDAP-Auth-Konto)"
 
 #: aleksis/apps/ldap/util/ldap_sync.py:87
 #, python-brace-format
