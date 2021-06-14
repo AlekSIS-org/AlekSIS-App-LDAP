@@ -116,7 +116,7 @@ msgstr "DN des LDAP-Admin-Kontos (wenn verschieden zu LDAP-Auth-Konto)"
 
 #: aleksis/apps/ldap/preferences.py:185
 msgid "Password of LDAP admin account (if other than LDAP auth account)"
-msgstr "Passwort des LDAP-Admin-Konto (wenn verschieden zu LDAP-Auth-Konto)"
+msgstr "Passwort des LDAP-Admin-Kontos (wenn verschieden zu LDAP-Auth-Konto)"
 
 #: aleksis/apps/ldap/util/ldap_sync.py:87
 #, python-brace-format
