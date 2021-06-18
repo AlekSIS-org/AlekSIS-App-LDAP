@@ -210,7 +210,7 @@ def ldap_sync_user_on_login(sender, user, ldap_user, **kwargs):
         except Person.MultipleObjectsReturned:
             logger.error(f"More than one matching person for user {user.username}")
             return
-        except (DataError, IntegrityError, ValueError) as e:
+        except (DataError, IntegrityError, KeyError, ValueError) as e:
             logger.error(f"Data error while synchronising user {user.username}:\n{e}")
             return
 
