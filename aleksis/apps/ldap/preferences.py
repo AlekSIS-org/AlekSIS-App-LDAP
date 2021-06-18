@@ -12,7 +12,7 @@ ldap = Section("ldap", verbose_name=_("LDAP"))
 class EnableLDAPSync(BooleanPreference):
     section = ldap
     name = "enable_sync"
-    default = True
+    default = False
     required = False
     verbose_name = _("Enable LDAP sync")
 
