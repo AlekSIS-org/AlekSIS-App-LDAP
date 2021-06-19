@@ -18,6 +18,8 @@ Fixed
 ~~~~~
 
 * Preferences were evaluated before the app was ready.
+* Disable LDAP sync by default to prevent loading with unexpected settings.
+* Gracefully fail on missing LDAP data attributes.
 
 `2.0b0`_ - 2021-05-21
 ---------------------
