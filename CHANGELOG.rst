@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
+`2.0rc1`_ - 2021-06-23
+----------------------
+
+Changed
+~~~~~~~
+
+* Add verbose name for preference section.
+
+Fixed
+~~~~~
+
+* Preferences were evaluated before the app was ready.
+* Disable LDAP sync by default to prevent loading with unexpected settings.
+* Gracefully fail on missing LDAP data attributes.
+
 `2.0b0`_ - 2021-05-21
 ---------------------
 
@@ -39,3 +54,4 @@ Added
 
 .. _2.0a2: https://edugit.org/AlekSIS/official/AlekSIS-App-LDAP/-/tags/2.0a2
 .. _2.0b0: https://edugit.org/AlekSIS/Official/AlekSIS-App-LDAP/-/tags/2.0b0
+.. _2.0rc1: https://edugit.org/AlekSIS/Official/AlekSIS-App-LDAP/-/tags/2.0rc1

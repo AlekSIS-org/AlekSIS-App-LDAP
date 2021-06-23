@@ -18,8 +18,6 @@ from tqdm import tqdm
 from aleksis.core.registries import site_preferences_registry
 from aleksis.core.util.core_helpers import get_site_preferences
 
-from ..preferences import ldap as section_ldap
-
 logger = logging.getLogger(__name__)
 
 TQDM_DEFAULTS = {
@@ -74,6 +72,8 @@ def from_ldap(value, field, dn, ldap_field, instance=None):
 
 def update_dynamic_preferences():
     """Auto-generate sync field settings from models."""
+    from ..preferences import ldap as section_ldap  # noqa
+
     Person = apps.get_model("core", "Person")
     for model in (Person,):
         # Collect fields that are matchable
@@ -210,7 +210,7 @@ def ldap_sync_user_on_login(sender, user, ldap_user, **kwargs):
         except Person.MultipleObjectsReturned:
             logger.error(f"More than one matching person for user {user.username}")
             return
-        except (DataError, IntegrityError, ValueError) as e:
+        except (DataError, IntegrityError, KeyError, ValueError) as e:
             logger.error(f"Data error while synchronising user {user.username}:\n{e}")
             return
 
